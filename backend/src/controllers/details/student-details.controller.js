@@ -1,0 +1,124 @@
+const studentDetailsService = require('../../services/student-details.service');
+const ApiResponse = require('../../utils/ApiResponse');
+
+const loginStudentController = async (req, res, next) => {
+  try {
+    const token = await studentDetailsService.loginStudent(req.body);
+    return ApiResponse.success({ token }, 'Login successful').send(res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getAllDetailsController = async (req, res, next) => {
+  try {
+    const users = await studentDetailsService.getAllDetails();
+    return ApiResponse.success(users, 'Student Details Found!').send(res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const registerStudentController = async (req, res, next) => {
+  try {
+    const sanitizedUser = await studentDetailsService.registerStudent(
+      req.body,
+      req.file
+    );
+    return ApiResponse.created(sanitizedUser, 'Student Details Added!').send(
+      res
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getMyDetailsController = async (req, res, next) => {
+  try {
+    const user = await studentDetailsService.getMyDetails(req.userId);
+    return ApiResponse.success(user, 'My Details Found!').send(res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateDetailsController = async (req, res, next) => {
+  try {
+    const updatedUser = await studentDetailsService.updateDetails(
+      req.params.id,
+      req.body,
+      req.file
+    );
+    return ApiResponse.success(updatedUser, 'Updated Successfully!').send(res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteDetailsController = async (req, res, next) => {
+  try {
+    await studentDetailsService.deleteDetails(req.params.id);
+    return ApiResponse.success(null, 'Deleted Successfully!').send(res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const sendForgetPasswordEmail = async (req, res, next) => {
+  try {
+    await studentDetailsService.sendForgetPasswordEmail(req.body.email);
+    return ApiResponse.success(null, 'Reset Mail Send Successful').send(res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updatePasswordHandler = async (req, res, next) => {
+  try {
+    await studentDetailsService.updatePassword(
+      req.params.resetId,
+      req.body.password
+    );
+    return ApiResponse.success(null, 'Password Updated!').send(res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const searchStudentsController = async (req, res, next) => {
+  try {
+    const students = await studentDetailsService.searchStudents(req.body);
+    return ApiResponse.success(students, 'Students found successfully').send(
+      res
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateLoggedInPasswordController = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    await studentDetailsService.updateLoggedInPassword(
+      req.userId,
+      currentPassword,
+      newPassword
+    );
+    return ApiResponse.success(null, 'Password updated successfully').send(res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  loginStudentController,
+  getAllDetailsController,
+  registerStudentController,
+  updateDetailsController,
+  deleteDetailsController,
+  getMyDetailsController,
+  sendForgetPasswordEmail,
+  updatePasswordHandler,
+  searchStudentsController,
+  updateLoggedInPasswordController,
+};

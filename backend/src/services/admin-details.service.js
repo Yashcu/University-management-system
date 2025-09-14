@@ -1,0 +1,276 @@
+const adminDetails = require('../models/details/admin-details.model');
+const resetToken = require('../models/reset-password.model');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const sendResetMail = require('../utils/SendMail');
+const config = require('../config');
+const { USER_ROLES, JWT_EXPIRATION } = require('../utils/constants');
+
+const loginAdmin = async (loginData) => {
+  const { email, password } = loginData;
+  const user = await adminDetails.findOne({ email });
+
+  if (!user) {
+    const err = new Error('User not found');
+    err.status = 404;
+    throw err;
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    const err = new Error('Invalid password');
+    err.status = 401;
+    throw err;
+  }
+
+  const payload = { userId: user._id, role: USER_ROLES.ADMIN };
+
+  return jwt.sign(payload, config.jwtSecret, {
+    expiresIn: JWT_EXPIRATION,
+  });
+};
+
+const getAllDetails = async () => {
+  const users = await adminDetails.find().select('-__v -password');
+
+  if (!users || users.length === 0) {
+    const err = new Error('No Admin Found');
+    err.status = 404;
+    throw err;
+  }
+  return users;
+};
+
+const registerAdmin = async (adminData, file) => {
+  const { email, phone } = adminData;
+
+  const existingAdmin = await adminDetails.findOne({
+    $or: [{ phone }, { email }],
+  });
+
+  if (existingAdmin) {
+    const err = new Error('Admin with these details already exists');
+    err.status = 409;
+    throw err;
+  }
+
+  const employeeId = Math.floor(100000 + Math.random() * 900000);
+
+  const user = await adminDetails.create({
+    ...adminData,
+    employeeId,
+    profile: file.filename,
+    password: 'admin123',
+  });
+
+  return await adminDetails.findById(user._id).select('-__v -password');
+};
+
+const getMyDetails = async (userId) => {
+  const user = await adminDetails.findById(userId).select('-password -__v');
+
+  if (!user) {
+    const err = new Error('User not found');
+    err.status = 404;
+    throw err;
+  }
+  return user;
+};
+
+const updateDetails = async (adminId, adminData, file) => {
+  const { email, phone, password } = adminData;
+
+  if (phone) {
+    const existingAdmin = await adminDetails.findOne({
+      _id: { $ne: adminId },
+      phone: phone,
+    });
+
+    if (existingAdmin) {
+      const err = new Error('Phone number already in use');
+      err.status = 409;
+      throw err;
+    }
+  }
+
+  if (email) {
+    const existingAdmin = await adminDetails.findOne({
+      _id: { $ne: adminId },
+      email: email,
+    });
+
+    if (existingAdmin) {
+      const err = new Error('Email already in use');
+      err.status = 409;
+      throw err;
+    }
+  }
+
+  if (password) {
+    const salt = await bcrypt.genSalt(10);
+    adminData.password = await bcrypt.hash(password, salt);
+  }
+
+  if (file) {
+    adminData.profile = file.filename;
+  }
+
+  if (adminData.dob) {
+    adminData.dob = new Date(adminData.dob);
+  }
+  if (adminData.joiningDate) {
+    adminData.joiningDate = new Date(adminData.joiningDate);
+  }
+
+  const updatedUser = await adminDetails
+    .findByIdAndUpdate(adminId, adminData, { new: true })
+    .select('-__v -password');
+
+  if (!updatedUser) {
+    const err = new Error('Admin not found');
+    err.status = 404;
+    throw err;
+  }
+  return updatedUser;
+};
+
+const deleteDetails = async (adminId) => {
+  if (!adminId) {
+    const err = new Error('Admin ID is required');
+    err.status = 400;
+    throw err;
+  }
+
+  const user = await adminDetails.findById(adminId);
+
+  if (!user) {
+    const err = new Error('No Admin Found');
+    err.status = 404;
+    throw err;
+  }
+
+  await adminDetails.findByIdAndDelete(adminId);
+};
+
+const sendForgetPasswordEmail = async (email) => {
+  if (!email) {
+    const err = new Error('Email is required');
+    err.status = 400;
+    throw err;
+  }
+
+  const user = await adminDetails.findOne({ email });
+
+  if (!user) {
+    const err = new Error('No Admin Found');
+    err.status = 404;
+    throw err;
+  }
+  const resetTkn = jwt.sign(
+    {
+      _id: user._id,
+    },
+    config.jwtSecret,
+    {
+      expiresIn: '10m',
+    }
+  );
+
+  await resetToken.deleteMany({
+    type: 'AdminDetails',
+    userId: user._id,
+  });
+
+  const resetId = await resetToken.create({
+    resetToken: resetTkn,
+    type: 'AdminDetails',
+    userId: user._id,
+  });
+
+  await sendResetMail(user.email, resetId._id, 'admin');
+};
+
+const updatePassword = async (resetId, password) => {
+  if (!resetId || !password) {
+    const err = new Error('Password and ResetId is Required');
+    err.status = 400;
+    throw err;
+  }
+
+  const resetTkn = await resetToken.findById(resetId);
+
+  if (!resetTkn) {
+    const err = new Error('No Reset Request Found');
+    err.status = 404;
+    throw err;
+  }
+
+  const verifyToken = await jwt.verify(resetTkn.resetToken, config.jwtSecret);
+
+  if (!verifyToken) {
+    const err = new Error('Token Expired');
+    err.status = 401;
+    throw err;
+  }
+
+  const salt = await bcrypt.genSalt(10);
+
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  await adminDetails.findByIdAndUpdate(verifyToken._id, {
+    password: hashedPassword,
+  });
+
+  await resetToken.deleteMany({
+    type: 'AdminDetails',
+    userId: verifyToken._id,
+  });
+};
+
+const updateLoggedInPassword = async (userId, currentPassword, newPassword) => {
+  if (!currentPassword || !newPassword) {
+    const err = new Error('Current password and new password are required');
+    err.status = 400;
+    throw err;
+  }
+
+  if (newPassword.length < 8) {
+    const err = new Error('New password must be at least 8 characters long');
+    err.status = 400;
+    throw err;
+  }
+
+  const user = await adminDetails.findById(userId);
+  if (!user) {
+    const err = new Error('User not found');
+    err.status = 404;
+    throw err;
+  }
+
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) {
+    const err = new Error('Current password is incorrect');
+    err.status = 401;
+    throw err;
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+  await adminDetails.findByIdAndUpdate(userId, {
+    password: hashedPassword,
+  });
+};
+
+module.exports = {
+  loginAdmin,
+  getAllDetails,
+  registerAdmin,
+  getMyDetails,
+  updateDetails,
+  deleteDetails,
+  sendForgetPasswordEmail,
+  updatePassword,
+  updateLoggedInPassword,
+};
