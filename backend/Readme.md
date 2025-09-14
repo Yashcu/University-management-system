@@ -33,7 +33,7 @@ This is the backend for the College Management System, a full-featured MERN stac
 1.  **Clone the repository:**
 
     ```bash
-    git clone
+    git clone https://github.com/Yashcu/University-management-system
     cd College-Management-System-master/backend
     ```
 
