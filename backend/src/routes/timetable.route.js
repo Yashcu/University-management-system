@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const upload = require('../middlewares/multer.middleware');
 const auth = require('../middlewares/auth.middleware');
+const authorize = require('../middlewares/authorize.middleware');
+const { USER_ROLES } = require('../utils/constants');
 const validate = require('../middlewares/validation.middleware');
 const {
   addTimetableSchema,
@@ -22,6 +24,7 @@ router.post(
   '/',
   auth,
   upload.single('file'),
+  authorize([USER_ROLES.ADMIN]),
   validate(addTimetableSchema),
   addTimetableController
 );
@@ -29,6 +32,7 @@ router.post(
 router.put(
   '/:id',
   auth,
+  authorize([USER_ROLES.ADMIN]),
   upload.single('file'),
   validate(updateTimetableSchema),
   updateTimetableController
@@ -37,6 +41,7 @@ router.put(
 router.delete(
   '/:id',
   auth,
+  authorize([USER_ROLES.ADMIN]),
   validate(deleteTimetableSchema),
   deleteTimetableController
 );

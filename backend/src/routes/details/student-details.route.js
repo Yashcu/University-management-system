@@ -21,7 +21,7 @@ const {
   updateDetailsController,
   deleteDetailsController,
   getMyDetailsController,
-  sendForgetPasswordEmail, // Controller name updated for clarity
+  sendForgetPasswordEmail,
   updatePasswordHandler,
   searchStudentsController,
   updateLoggedInPasswordController,
@@ -66,7 +66,7 @@ router.post(
   validate(changePasswordSchema),
   updateLoggedInPasswordController
 );
-router.post(
+router.get(
   '/search',
   auth,
   validate(searchStudentsSchema),

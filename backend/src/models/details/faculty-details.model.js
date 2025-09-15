@@ -5,6 +5,8 @@ const facultyDetailsSchema = new mongoose.Schema(
     employeeId: {
       type: Number,
       required: true,
+      unique: true,
+      index: true,
     },
     firstName: {
       type: String,
@@ -17,6 +19,8 @@ const facultyDetailsSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
+      index: true,
     },
     phone: {
       type: String,

@@ -5,6 +5,8 @@ const studentDetailsSchema = new mongoose.Schema(
     enrollmentNo: {
       type: Number,
       required: true,
+      unique: true,
+      index: true,
     },
     firstName: {
       type: String,
@@ -20,6 +22,8 @@ const studentDetailsSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
+      index: true,
     },
     phone: {
       type: String,
