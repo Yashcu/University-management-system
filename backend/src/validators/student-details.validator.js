@@ -101,7 +101,7 @@ const changePasswordSchema = z.object({
 });
 
 const searchStudentsSchema = z.object({
-  body: z
+  query: z
     .object({
       enrollmentNo: z.coerce.number().int().positive().optional(),
       name: z.string().min(1).optional(),

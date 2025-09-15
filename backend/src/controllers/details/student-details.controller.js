@@ -87,7 +87,7 @@ const updatePasswordHandler = async (req, res, next) => {
 
 const searchStudentsController = async (req, res, next) => {
   try {
-    const students = await studentDetailsService.searchStudents(req.body);
+    const students = await studentDetailsService.searchStudents(req.query);
     return ApiResponse.success(students, 'Students found successfully').send(
       res
     );
