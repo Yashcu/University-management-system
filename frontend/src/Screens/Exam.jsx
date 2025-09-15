@@ -27,13 +27,13 @@ const Exam = () => {
   // Form state
   const [examName, setExamName] = useState('');
   const [examDate, setExamDate] = useState('');
-  const [examType, setExamType] = useState('Internal');
+  const [examType, setExamType] = useState('mid');
   const [subjectId, setSubjectId] = useState('');
 
   const resetForm = () => {
     setExamName('');
     setExamDate('');
-    setExamType('Internal');
+    setExamType('mid');
     setSubjectId('');
     setSelectedBranch('');
     setIsEditing(false);
@@ -43,7 +43,7 @@ const Exam = () => {
   const getExams = async () => {
     setIsLoading(true);
     try {
-      const { data } = await examService.getAllExams();
+      const { data } = await examService.search();
       setExams(data?.data || []);
     } catch (error) {
       toast.error('Failed to fetch exams');
@@ -55,9 +55,9 @@ const Exam = () => {
 
   const getFormData = async () => {
     try {
-      const branchRes = await branchService.getAllBranches();
+      const branchRes = await branchService.search();
       setBranches(branchRes.data?.data || []);
-      const subjectRes = await subjectService.getAllSubjects();
+      const subjectRes = await subjectService.search();
       setSubjects(subjectRes.data?.data || []);
     } catch (error) {
       toast.error('Failed to fetch form data');
@@ -80,7 +80,7 @@ const Exam = () => {
     setSelectedExamId(exam._id);
     setExamName(exam.name);
     setExamDate(new Date(exam.date).toISOString().split('T')[0]);
-    setExamType(exam.type);
+    setExamType(exam.examType);
     setSelectedBranch(exam.branch?._id || '');
     setSubjectId(exam.subject?._id || '');
     setShowAddForm(true);
@@ -96,19 +96,20 @@ const Exam = () => {
     const examData = {
       name: examName,
       date: examDate,
-      type: examType,
+      examType: examType,
       branch: selectedBranch,
       subject: subjectId,
+      totalMarks: 100, // Assuming a default for now
     };
 
     try {
       let res;
       if (isEditing) {
         toast.loading('Updating Exam...');
-        res = await examService.updateExam(selectedExamId, examData);
+        res = await examService.update(selectedExamId, examData);
       } else {
         toast.loading('Adding Exam...');
-        res = await examService.addExam(examData);
+        res = await examService.add(examData);
       }
       toast.dismiss();
       if (res.data?.success) {
@@ -134,7 +135,7 @@ const Exam = () => {
     setProcessLoading(true);
     toast.loading('Deleting Exam...');
     try {
-      const res = await examService.deleteExam(selectedExamId);
+      const res = await examService.delete(selectedExamId);
       toast.dismiss();
       if (res.data?.success) {
         toast.success(res.data.message);
@@ -193,7 +194,7 @@ const Exam = () => {
                   <td className="py-3 px-4">
                     {new Date(exam.date).toLocaleDateString()}
                   </td>
-                  <td className="py-3 px-4">{exam.type}</td>
+                  <td className="py-3 px-4">{exam.examType}</td>
                   <td className="py-3 px-4">{exam.branch?.name || 'N/A'}</td>
                   <td className="py-3 px-4">{exam.subject?.name || 'N/A'}</td>
                   <td className="py-3 px-4 flex gap-2">
@@ -249,8 +250,8 @@ const Exam = () => {
                 onChange={(e) => setExamType(e.target.value)}
                 className="w-full px-4 py-2 border rounded-md"
               >
-                <option value="Internal">Internal</option>
-                <option value="External">External</option>
+                <option value="mid">Mid Term</option>
+                <option value="end">End Term</option>
               </select>
             </div>
             <div>
@@ -278,7 +279,7 @@ const Exam = () => {
                 <option value="">Select Subject</option>
                 {subjects.map((s) => (
                   <option key={s._id} value={s._id}>
-                    {s.name} ({s.subjectCode})
+                    {s.name} ({s.code})
                   </option>
                 ))}
               </select>

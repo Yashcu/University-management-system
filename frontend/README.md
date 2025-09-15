@@ -1,68 +1,12 @@
-# College Management System - Frontend
+# React + Vite
 
-This is the frontend for the College Management System, built with React. It provides the user interface for three distinct user roles: Admin, Faculty, and Student.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Features
+Currently, two official plugins are available:
 
-- **Role-Based Dashboards**: Separate, tailored interfaces for Admins, Faculty, and Students.
-- **Admin Management**: Full CRUD (Create, Read, Update, Delete) functionality for managing students, faculty, branches, and subjects.
-- **Faculty Tools**: Tools for finding students, managing study materials, uploading marks, and viewing timetables.
-- **Student Portal**: Allows students to view their profile, marks, study materials, and timetables.
-- **Secure Authentication**: JWT-based authentication with protected routes.
-- **Modern UI**: Built with Tailwind CSS for a responsive and clean user experience.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Tech Stack
+## Expanding the ESLint configuration
 
-- **React.js**: For building the user interface.
-- **React Router**: For client-side routing.
-- **Redux Toolkit**: For predictable and centralized state management.
-- **Tailwind CSS**: For styling.
-- **React Hook Form & Zod**: For robust and validated forms.
-- **Axios**: For making API requests to the backend.
-- **React Hot Toast**: For user notifications.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v18.x or later)
-- npm or yarn
-
-### Installation & Setup
-
-1.  **Clone the repository:**
-    ```sh
-    git clone https://github.com/Yashcu/University-management-system
-    ```
-
-2.  **Navigate to the frontend directory:**
-    ```sh
-    cd College-Management-System/frontend
-    ```
-
-3.  **Install dependencies:**
-    ```sh
-    npm install
-    ```
-
-4.  **Create an environment file:**
-    Create a `.env` file in the `frontend` directory by copying the sample file:
-    ```sh
-    cp .env.sample .env
-    ```
-
-5.  **Configure the environment variable:**
-    Open the `.env` file and set the `REACT_APP_API_BASE_URL` to the URL of your running backend server.
-    ```
-    REACT_APP_API_BASE_URL=http://localhost:8080/api/v1
-    ```
-
-### Available Scripts
-
-In the project directory, you can run:
-
--   `npm start`: Runs the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
--   `npm test`: Launches the test runner in interactive watch mode.
--   `npm run build`: Builds the app for production to the `build` folder.
--   `npm run format`: Formats all source files using Prettier.
--   `npm run lint`: Lints all source files using ESLint.
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

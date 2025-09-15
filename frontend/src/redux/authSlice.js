@@ -1,11 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// Get initial state from localStorage if it exists
+let parsedUser = null;
+try {
+  const userString = localStorage.getItem('user');
+  if (userString && userString !== 'undefined') {
+    parsedUser = JSON.parse(userString);
+  }
+} catch (error) {
+  console.error('Could not parse user from localStorage', error);
+  parsedUser = null;
+}
+
 const initialState = {
   userToken: localStorage.getItem('userToken') || null,
   userType: localStorage.getItem('userType') || null,
   isAuthenticated: !!localStorage.getItem('userToken'),
-  user: JSON.parse(localStorage.getItem('user')) || null,
+  user: parsedUser,
 };
 
 const authSlice = createSlice({
@@ -16,9 +26,12 @@ const authSlice = createSlice({
       state.userToken = action.payload.userToken;
       state.userType = action.payload.userType;
       state.isAuthenticated = true;
+      state.user = action.payload.user; // Save user data to state
       localStorage.setItem('userToken', action.payload.userToken);
       localStorage.setItem('userType', action.payload.userType);
-      localStorage.setItem('user', JSON.stringify(action.payload.user));
+      if (action.payload.user) {
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+      }
     },
     logout: (state) => {
       state.userToken = null;

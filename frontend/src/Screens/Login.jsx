@@ -28,7 +28,7 @@ const Login = () => {
 
       toast.dismiss();
       if (data.success) {
-        dispatch(loginSuccess({ userToken: data.data.accessToken, userType }));
+        dispatch(loginSuccess({ userToken: data.data.token, userType }));
         toast.success('Login Successful!');
         navigate(`/${userType}`);
       }

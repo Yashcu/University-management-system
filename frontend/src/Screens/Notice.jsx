@@ -22,7 +22,7 @@ const Notice = () => {
   const getNotices = async () => {
     setIsLoading(true);
     try {
-      const { data } = await noticeService.getAllNotices();
+      const { data } = await noticeService.search();
       setNotices(data?.data || []);
     } catch (error) {
       toast.error('Failed to fetch notices');
@@ -44,7 +44,7 @@ const Notice = () => {
     setProcessLoading(true);
     toast.loading('Adding Notice...');
     try {
-      const { data } = await noticeService.addNotice({ title, description });
+      const { data } = await noticeService.add({ title, description });
       toast.dismiss();
       if (data?.success) {
         toast.success(data.message);

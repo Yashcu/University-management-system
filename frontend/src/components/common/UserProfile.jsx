@@ -10,6 +10,7 @@ const UserProfile = () => {
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   // Form state
   const [name, setName] = useState('');
@@ -175,19 +176,31 @@ const UserProfile = () => {
                 />
               </div>
               {renderExtraFields()}
-              <CustomButton
-                type="submit"
-                loading={isProcessing}
-                disabled={isProcessing}
-              >
-                Update Profile
-              </CustomButton>
+              <div className="flex justify-between items-center">
+                <CustomButton
+                  type="submit"
+                  loading={isProcessing}
+                  disabled={isProcessing}
+                >
+                  Update Profile
+                </CustomButton>
+                <CustomButton
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setIsPasswordModalOpen(true)}
+                >
+                  Change Password
+                </CustomButton>
+              </div>
             </form>
           </div>
-          <div>
-            <UpdatePasswordLoggedIn />
-          </div>
         </div>
+      )}
+      {isPasswordModalOpen && (
+        <UpdatePasswordLoggedIn
+          isOpen={isPasswordModalOpen}
+          onClose={() => setIsPasswordModalOpen(false)}
+        />
       )}
     </div>
   );

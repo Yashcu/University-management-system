@@ -2,7 +2,7 @@ import React from 'react';
 import { MdEdit, MdOutlineDelete } from 'react-icons/md';
 import CustomButton from '../../../components/ui/CustomButton';
 
-const AdminTable = ({ admins, editAdminHandler, deleteAdminHandler }) => {
+const AdminTable = ({ admins, onEdit, onDelete }) => {
   return (
     <div className="mt-8 w-full">
       <table className="text-sm min-w-full bg-white">
@@ -32,13 +32,13 @@ const AdminTable = ({ admins, editAdminHandler, deleteAdminHandler }) => {
                 <td className="py-4 px-6 text-center flex justify-center gap-4">
                   <CustomButton
                     variant="secondary"
-                    onClick={() => editAdminHandler(item)}
+                    onClick={() => onEdit(item)}
                   >
                     <MdEdit />
                   </CustomButton>
                   <CustomButton
                     variant="danger"
-                    onClick={() => deleteAdminHandler(item._id)}
+                    onClick={() => onDelete(item)}
                   >
                     <MdOutlineDelete />
                   </CustomButton>
