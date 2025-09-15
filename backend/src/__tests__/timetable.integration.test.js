@@ -44,10 +44,7 @@ describe('Timetable API - Integration Tests', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .field('semester', '3')
         .field('branch', sampleBranchId.toString())
-        .attach(
-          'file',
-          path.resolve(__dirname, '../../media/1757875567953.jpg')
-        );
+        .attach('file', path.resolve(__dirname, '../media/Faculty_Profile_123456.jpg'))
 
       expect(response.statusCode).toBe(201);
       expect(response.body.data).toHaveProperty('link');
@@ -60,10 +57,7 @@ describe('Timetable API - Integration Tests', () => {
         .set('Authorization', `Bearer ${studentToken}`)
         .field('semester', '1')
         .field('branch', sampleBranchId.toString())
-        .attach(
-          'file',
-          path.resolve(__dirname, '../../media/1757875567953.jpg')
-        );
+        .attach('file', path.resolve(__dirname, '../media/Faculty_Profile_123456.jpg'))
 
       expect(response.statusCode).toBe(403);
     });
