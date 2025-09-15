@@ -44,7 +44,7 @@ describe('Exam API - Integration Tests', () => {
         .field('semester', '5')
         .field('examType', 'mid')
         .field('totalMarks', '100')
-        .attach('file', path.resolve(__dirname, '../media/Faculty_Profile_123456.jpg'))
+        .attach('file', path.resolve(__dirname, '../../test-media/mock.jpg'))
 
       expect(response.statusCode).toBe(200);
       expect(response.body.data.name).toBe('Mid-Term Examination');
@@ -59,7 +59,7 @@ describe('Exam API - Integration Tests', () => {
         .field('semester', '1')
         .field('examType', 'end')
         .field('totalMarks', '75')
-        .attach('file', path.resolve(__dirname, '../media/Faculty_Profile_123456.jpg'))
+      .attach('file', path.resolve(__dirname, '../../test-media/mock.jpg'))
 
       expect(response.statusCode).toBe(403);
     });
