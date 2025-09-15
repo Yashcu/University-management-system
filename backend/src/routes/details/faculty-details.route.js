@@ -20,7 +20,7 @@ const {
   deleteFacultyController,
   getAllFacultyController,
   getMyFacultyDetailsController,
-  sendFacultyResetPasswordEmail, // Controller name updated for clarity
+  sendFacultyResetPasswordEmail,
   updateFacultyPasswordHandler,
   updateLoggedInPasswordController,
 } = require('../../controllers/details/faculty-details.controller');
@@ -35,6 +35,7 @@ router.post('/login', validate(loginFacultySchema), loginFacultyController);
 router.get('/my-details', auth, getMyFacultyDetailsController);
 
 router.get('/', auth, getAllFacultyController);
+
 router.patch(
   '/:id',
   auth,

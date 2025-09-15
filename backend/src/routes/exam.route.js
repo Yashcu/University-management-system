@@ -22,6 +22,7 @@ router.get('/', auth, getAllExamsController);
 router.post(
   '/',
   auth,
+  authorize([USER_ROLES.ADMIN]),
   upload.single('file'),
   validate(addExamSchema),
   addExamController
@@ -29,6 +30,7 @@ router.post(
 router.patch(
   '/:id',
   auth,
+  authorize([USER_ROLES.ADMIN]),
   upload.single('file'),
   validate(updateExamSchema),
   updateExamController

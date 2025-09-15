@@ -7,10 +7,10 @@
     "start": "node src/index.js",
     "dev": "nodemon index.js",
     "seed": "node src/admin-seeder.js",
-    "test": "jest --detectOpenHandles",
+    "test": "jest --detectOpenHandles --forceExit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write \"**/*.{js,json}\""
+    "format": "prettier --write \"src/**/*.js\""
   },
   "author": "Yash Garg",
   "license": "ISC",

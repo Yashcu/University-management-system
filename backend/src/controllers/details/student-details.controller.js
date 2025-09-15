@@ -12,7 +12,12 @@ const loginStudentController = async (req, res, next) => {
 
 const getAllDetailsController = async (req, res, next) => {
   try {
-    const users = await studentDetailsService.getAllDetails();
+    let users;
+    if (Object.keys(req.query).length > 0) {
+      users = await studentDetailsService.searchStudents(req.query);
+    } else {
+      users = await studentDetailsService.getAllDetails();
+    }
     return ApiResponse.success(users, 'Student Details Found!').send(res);
   } catch (error) {
     next(error);
@@ -85,16 +90,6 @@ const updatePasswordHandler = async (req, res, next) => {
   }
 };
 
-const searchStudentsController = async (req, res, next) => {
-  try {
-    const students = await studentDetailsService.searchStudents(req.query);
-    return ApiResponse.success(students, 'Students found successfully').send(
-      res
-    );
-  } catch (error) {
-    next(error);
-  }
-};
 
 const updateLoggedInPasswordController = async (req, res, next) => {
   try {
@@ -119,6 +114,5 @@ module.exports = {
   getMyDetailsController,
   sendForgetPasswordEmail,
   updatePasswordHandler,
-  searchStudentsController,
   updateLoggedInPasswordController,
 };

@@ -5,23 +5,20 @@ const jwt = require('jsonwebtoken');
 const sendResetMail = require('../utils/SendMail');
 const config = require('../config');
 const { USER_ROLES, JWT_EXPIRATION } = require('../utils/constants');
+const ApiError = require('../utils/ApiError');
 
 const loginAdmin = async (loginData) => {
   const { email, password } = loginData;
   const user = await adminDetails.findOne({ email });
 
   if (!user) {
-    const err = new Error('User not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'User not found');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    const err = new Error('Invalid password');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'Invalid password');
   }
 
   const payload = { userId: user._id, role: USER_ROLES.ADMIN };
@@ -35,9 +32,7 @@ const getAllDetails = async () => {
   const users = await adminDetails.find().select('-__v -password');
 
   if (!users || users.length === 0) {
-    const err = new Error('No Admin Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Admin Found');
   }
   return users;
 };
@@ -50,9 +45,7 @@ const registerAdmin = async (adminData, file) => {
   });
 
   if (existingAdmin) {
-    const err = new Error('Admin with these details already exists');
-    err.status = 409;
-    throw err;
+    throw new ApiError(409, 'Admin with these details already exists');
   }
 
   const employeeId = Math.floor(100000 + Math.random() * 900000);
@@ -71,9 +64,7 @@ const getMyDetails = async (userId) => {
   const user = await adminDetails.findById(userId).select('-password -__v');
 
   if (!user) {
-    const err = new Error('User not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'User not found');
   }
   return user;
 };
@@ -88,9 +79,7 @@ const updateDetails = async (adminId, adminData, file) => {
     });
 
     if (existingAdmin) {
-      const err = new Error('Phone number already in use');
-      err.status = 409;
-      throw err;
+      throw new ApiError(409, 'Phone number already in use');
     }
   }
 
@@ -101,9 +90,7 @@ const updateDetails = async (adminId, adminData, file) => {
     });
 
     if (existingAdmin) {
-      const err = new Error('Email already in use');
-      err.status = 409;
-      throw err;
+      throw new ApiError(409, 'Email already in use');
     }
   }
 
@@ -128,26 +115,20 @@ const updateDetails = async (adminId, adminData, file) => {
     .select('-__v -password');
 
   if (!updatedUser) {
-    const err = new Error('Admin not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Admin not found');
   }
   return updatedUser;
 };
 
 const deleteDetails = async (adminId) => {
   if (!adminId) {
-    const err = new Error('Admin ID is required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Admin ID is required');
   }
 
   const user = await adminDetails.findById(adminId);
 
   if (!user) {
-    const err = new Error('No Admin Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Admin Found');
   }
 
   await adminDetails.findByIdAndDelete(adminId);
@@ -155,17 +136,13 @@ const deleteDetails = async (adminId) => {
 
 const sendForgetPasswordEmail = async (email) => {
   if (!email) {
-    const err = new Error('Email is required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Email is required');
   }
 
   const user = await adminDetails.findOne({ email });
 
   if (!user) {
-    const err = new Error('No Admin Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Admin Found');
   }
   const resetTkn = jwt.sign(
     {
@@ -193,25 +170,19 @@ const sendForgetPasswordEmail = async (email) => {
 
 const updatePassword = async (resetId, password) => {
   if (!resetId || !password) {
-    const err = new Error('Password and ResetId is Required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Password and ResetId is Required');
   }
 
   const resetTkn = await resetToken.findById(resetId);
 
   if (!resetTkn) {
-    const err = new Error('No Reset Request Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Reset Request Found');
   }
 
   const verifyToken = await jwt.verify(resetTkn.resetToken, config.jwtSecret);
 
   if (!verifyToken) {
-    const err = new Error('Token Expired');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'Token Expired');
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -230,29 +201,21 @@ const updatePassword = async (resetId, password) => {
 
 const updateLoggedInPassword = async (userId, currentPassword, newPassword) => {
   if (!currentPassword || !newPassword) {
-    const err = new Error('Current password and new password are required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Current password and new password are required');
   }
 
   if (newPassword.length < 8) {
-    const err = new Error('New password must be at least 8 characters long');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'New password must be at least 8 characters long');
   }
 
   const user = await adminDetails.findById(userId);
   if (!user) {
-    const err = new Error('User not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'User not found');
   }
 
   const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
   if (!isPasswordValid) {
-    const err = new Error('Current password is incorrect');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'Current password is incorrect');
   }
 
   const salt = await bcrypt.genSalt(10);

@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const sendResetMail = require('../utils/SendMail');
 const config = require('../config');
 const { USER_ROLES, JWT_EXPIRATION } = require('../utils/constants');
+const ApiError = require('../utils/ApiError');
 
 const loginStudent = async (loginData) => {
   const { email, password } = loginData;
@@ -12,17 +13,13 @@ const loginStudent = async (loginData) => {
   const user = await studentDetails.findOne({ email });
 
   if (!user) {
-    const err = new Error('User not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'User not found');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    const err = new Error('Invalid password');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'Invalid password');
   }
 
   const payload = { userId: user._id, role: USER_ROLES.STUDENT };
@@ -39,9 +36,7 @@ const getAllDetails = async () => {
     .populate('branchId');
 
   if (!users || users.length === 0) {
-    const err = new Error('No Student Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Student Found');
   }
   return users;
 };
@@ -69,9 +64,7 @@ const getMyDetails = async (userId) => {
     .populate('branchId');
 
   if (!user) {
-    const err = new Error('User not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'User not found');
   }
   return user;
 };
@@ -86,9 +79,7 @@ const updateDetails = async (studentId, studentData, file) => {
     });
 
     if (existingStudent) {
-      const err = new Error('Phone number already in use');
-      err.status = 409;
-      throw err;
+      throw new ApiError(409, 'Phone number already in use');
     }
   }
 
@@ -99,9 +90,7 @@ const updateDetails = async (studentId, studentData, file) => {
     });
 
     if (existingStudent) {
-      const err = new Error('Email already in use');
-      err.status = 409;
-      throw err;
+      throw new ApiError(409, 'Email already in use');
     }
   }
 
@@ -112,9 +101,7 @@ const updateDetails = async (studentId, studentData, file) => {
     });
 
     if (existingStudent) {
-      const err = new Error('Enrollment number already in use');
-      err.status = 409;
-      throw err;
+      throw new ApiError(409, 'Enrollment number already in use');
     }
   }
 
@@ -139,9 +126,7 @@ const updateDetails = async (studentId, studentData, file) => {
     .select('-__v -password');
 
   if (!updatedUser) {
-    const err = new Error('Student not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Student not found');
   }
 
   return updatedUser;
@@ -149,17 +134,13 @@ const updateDetails = async (studentId, studentData, file) => {
 
 const deleteDetails = async (studentId) => {
   if (!studentId) {
-    const err = new Error('Student ID is required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Student ID is required');
   }
 
   const user = await studentDetails.findById(studentId);
 
   if (!user) {
-    const err = new Error('No Student Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Student Found');
   }
 
   await studentDetails.findByIdAndDelete(studentId);
@@ -167,17 +148,13 @@ const deleteDetails = async (studentId) => {
 
 const sendForgetPasswordEmail = async (email) => {
   if (!email) {
-    const err = new Error('Email is required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Email is required');
   }
 
   const user = await studentDetails.findOne({ email });
 
   if (!user) {
-    const err = new Error('No Student Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Student Found');
   }
   const resetTkn = jwt.sign(
     {
@@ -205,17 +182,13 @@ const sendForgetPasswordEmail = async (email) => {
 
 const updatePassword = async (resetId, password) => {
   if (!resetId || !password) {
-    const err = new Error('Password and ResetId is Required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Password and ResetId is Required');
   }
 
   const resetTkn = await resetToken.findById(resetId);
 
   if (!resetTkn) {
-    const err = new Error('No Reset Request Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Reset Request Found');
   }
 
   const verifyToken = await jwt.verify(
@@ -224,9 +197,7 @@ const updatePassword = async (resetId, password) => {
   );
 
   if (!verifyToken) {
-    const err = new Error('Token Expired');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'Token Expired');
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -264,38 +235,28 @@ const searchStudents = async (searchData) => {
     .sort({ enrollmentNo: 1 });
 
   if (!students || students.length === 0) {
-    const err = new Error('No students found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No students found');
   }
   return students;
 };
 
 const updateLoggedInPassword = async (userId, currentPassword, newPassword) => {
   if (!currentPassword || !newPassword) {
-    const err = new Error('Current password and new password are required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Current password and new password are required');
   }
 
   if (newPassword.length < 8) {
-    const err = new Error('New password must be at least 8 characters long');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'New password must be at least 8 characters long');
   }
 
   const user = await studentDetails.findById(userId);
   if (!user) {
-    const err = new Error('User not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'User not found');
   }
 
   const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
   if (!isPasswordValid) {
-    const err = new Error('Current password is incorrect');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'Current password is incorrect');
   }
 
   const salt = await bcrypt.genSalt(10);

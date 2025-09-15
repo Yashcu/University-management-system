@@ -19,4 +19,6 @@ const TimeTable = new mongoose.Schema(
   { timestamps: true }
 );
 
+TimeTable.index({ branch: 1, semester: 1 }, { unique: true });
+
 module.exports = mongoose.model('Timetable', TimeTable);

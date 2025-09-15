@@ -10,11 +10,13 @@ const Material = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Subject',
       required: true,
+      index: true,
     },
     faculty: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'FacultyDetail',
       required: true,
+      index: true,
     },
     file: {
       type: String,
@@ -28,11 +30,13 @@ const Material = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Branch',
       required: true,
+      index: true,
     },
     type: {
       type: String,
       enum: ['notes', 'assignment', 'syllabus', 'other'],
       required: true,
+      index: true,
     },
   },
   { timestamps: true }

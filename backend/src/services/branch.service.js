@@ -1,4 +1,5 @@
 const Branch = require('../models/branch.model');
+const ApiError = require('../utils/ApiError');
 
 async function getAllBranches(search = '') {
   return Branch.find({
@@ -13,9 +14,7 @@ async function addBranch(data) {
   const { name, branchId } = data;
   const existing = await Branch.findOne({ $or: [{ name }, { branchId }] });
   if (existing) {
-    const err = new Error('Branch with this name or ID already exists!');
-    err.status = 409;
-    throw err;
+    throw new ApiError(409, 'Branch with this name or ID already exists!');
   }
   return Branch.create(data);
 }
@@ -28,16 +27,12 @@ async function updateBranch(id, data) {
       $or: [name ? { name } : {}, branchId ? { branchId } : {}],
     });
     if (existing) {
-      const err = new Error('Branch with this name or ID already exists!');
-      err.status = 409;
-      throw err;
+      throw new ApiError(409, 'Branch with this name or ID already exists!');
     }
   }
   const updated = await Branch.findByIdAndUpdate(id, data, { new: true });
   if (!updated) {
-    const err = new Error('Branch Not Found!');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Branch Not Found!');
   }
   return updated;
 }
@@ -45,9 +40,7 @@ async function updateBranch(id, data) {
 async function deleteBranch(id) {
   const branch = await Branch.findByIdAndDelete(id);
   if (!branch) {
-    const err = new Error('Branch Not Found!');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Branch Not Found!');
   }
   return branch;
 }

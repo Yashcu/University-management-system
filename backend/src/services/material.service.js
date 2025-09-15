@@ -1,4 +1,5 @@
 const Material = require('../models/material.model');
+const ApiError = require('../utils/ApiError');
 
 const getMaterials = async (queryParams) => {
   const { subject, faculty, semester, branch, type } = queryParams;
@@ -17,9 +18,7 @@ const getMaterials = async (queryParams) => {
     .sort({ createdAt: -1 });
 
   if (!materials || materials.length === 0) {
-    const err = new Error('No materials found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No materials found');
   }
 
   return materials;
@@ -27,9 +26,7 @@ const getMaterials = async (queryParams) => {
 
 const addMaterial = async (materialData, file, userId) => {
   if (!file) {
-    const err = new Error('Material file is required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Material file is required');
   }
 
   const material = await Material.create({
@@ -48,15 +45,11 @@ const updateMaterial = async (materialId, materialData, file, userId) => {
   const material = await Material.findById(materialId);
 
   if (!material) {
-    const err = new Error('Material not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Material not found');
   }
 
   if (material.faculty.toString() !== userId) {
-    const err = new Error('You are not authorized to update this material');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'You are not authorized to update this material');
   }
 
   if (file) {
@@ -75,15 +68,11 @@ const deleteMaterial = async (materialId, userId) => {
   const material = await Material.findById(materialId);
 
   if (!material) {
-    const err = new Error('Material not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Material not found');
   }
 
   if (material.faculty.toString() !== userId) {
-    const err = new Error('You are not authorized to delete this material');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'You are not authorized to delete this material');
   }
 
   await Material.findByIdAndDelete(materialId);

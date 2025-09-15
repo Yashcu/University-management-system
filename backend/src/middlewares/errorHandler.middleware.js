@@ -1,16 +1,27 @@
-const ApiResponse = require('../utils/ApiResponse');
+const ApiError = require('../utils/ApiError');
 const logger = require('../utils/logger');
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
-  const statusCode = err.status || 500;
-  const message = err.message || 'Internal Server Error';
-
-  if (statusCode === 500) {
-    logger.error('SERVER ERROR:', err.stack);
+  if (err instanceof ApiError) {
+    return res.status(err.statusCode).json({
+      success: err.success,
+      message: err.message,
+    });
   }
 
-  return ApiResponse.error(message, statusCode).send(res);
+  logger.error('SERVER ERROR:', {
+    message: err.message,
+    stack: err.stack,
+    url: req.originalUrl,
+    method: req.method,
+    ip: req.ip,
+  });
+
+  return res.status(500).json({
+    success: false,
+    message: 'Internal Server Error',
+  });
 };
 
 module.exports = errorHandler;

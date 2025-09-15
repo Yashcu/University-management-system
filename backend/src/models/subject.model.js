@@ -9,15 +9,19 @@ const Subject = new mongoose.Schema(
     code: {
       type: String,
       required: true,
+      unique: true,
+      index: true,
     },
     branch: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Branch',
       required: true,
+      index: true,
     },
     semester: {
       type: Number,
       required: true,
+      index: true,
     },
     credits: {
       type: Number,

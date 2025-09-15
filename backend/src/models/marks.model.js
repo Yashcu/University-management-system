@@ -26,4 +26,6 @@ const marksSchema = new mongoose.Schema({
   },
 });
 
+marksSchema.index({ studentId: 1, subjectId: 1, examId: 1 });
+
 module.exports = mongoose.model('Marks', marksSchema);

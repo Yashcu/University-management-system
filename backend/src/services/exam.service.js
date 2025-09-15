@@ -1,4 +1,5 @@
 const Exam = require('../models/exam.model');
+const ApiError = require('../utils/ApiError');
 
 const getAllExams = async (queryParams) => {
   const { examType = '', semester = '' } = queryParams;
@@ -11,9 +12,7 @@ const getAllExams = async (queryParams) => {
   const exams = await Exam.find(query);
 
   if (!exams || exams.length === 0) {
-    const err = new Error('No Exams Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Exams Found');
   }
   return exams;
 };
@@ -33,9 +32,7 @@ const updateExam = async (examId, examData, file) => {
     new: true,
   });
   if (!exam) {
-    const err = new Error('Exam Not Found!');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Exam Not Found!');
   }
   return exam;
 };
@@ -43,9 +40,7 @@ const updateExam = async (examId, examData, file) => {
 const deleteExam = async (examId) => {
   const exam = await Exam.findByIdAndDelete(examId);
   if (!exam) {
-    const err = new Error('Exam Not Found!');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Exam Not Found!');
   }
   return exam;
 };

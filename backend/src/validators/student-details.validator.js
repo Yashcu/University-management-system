@@ -6,37 +6,38 @@ const pincodeRegex = /^\d{6}$/;
 
 const loginStudentSchema = z.object({
   body: z.object({
-    email: z.string().email('Invalid email format'),
+    email: z.string().trim().email('Invalid email format'),
     password: z.string().min(1, 'Password is required'),
   }),
 });
 
 const registerStudentSchema = z.object({
   body: z.object({
-    firstName: z.string().min(1, 'First name is required'),
-    middleName: z.string().optional(),
-    lastName: z.string().min(1, 'Last name is required'),
-    phone: z.string().regex(phoneRegex, 'Phone number must be 10 digits'),
+    firstName: z.string().trim().min(1, 'First name is required'),
+    middleName: z.string().trim().optional(),
+    lastName: z.string().trim().min(1, 'Last name is required'),
+    phone: z.string().trim().regex(phoneRegex, 'Phone number must be 10 digits'),
     semester: z.coerce.number().int().min(1).max(8),
-    branchId: z.string().regex(objectIdRegex, 'Invalid Branch ID format'),
+    branchId: z.string().trim().regex(objectIdRegex, 'Invalid Branch ID format'),
     gender: z.enum(['male', 'female', 'other']),
     dob: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: 'Invalid date of birth format',
     }),
-    address: z.string().min(1, 'Address is required'),
-    city: z.string().min(1, 'City is required'),
-    state: z.string().min(1, 'State is required'),
-    pincode: z.string().regex(pincodeRegex, 'Pincode must be 6 digits'),
-    country: z.string().min(1, 'Country is required'),
+    address: z.string().trim().min(1, 'Address is required'),
+    city: z.string().trim().min(1, 'City is required'),
+    state: z.string().trim().min(1, 'State is required'),
+    pincode: z.string().trim().regex(pincodeRegex, 'Pincode must be 6 digits'),
+    country: z.string().trim().min(1, 'Country is required'),
     bloodGroup: z
       .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
       .optional(),
     emergencyContact: z
       .object({
-        name: z.string().min(1),
-        relationship: z.string().min(1),
+        name: z.string().trim().min(1),
+        relationship: z.string().trim().min(1),
         phone: z
           .string()
+          .trim()
           .regex(phoneRegex, 'Emergency phone must be 10 digits'),
       })
       .optional(),
@@ -45,12 +46,13 @@ const registerStudentSchema = z.object({
 
 const updateDetailsSchema = z.object({
   params: z.object({
-    id: z.string().regex(objectIdRegex, 'Invalid ID format'),
+    id: z.string().trim().regex(objectIdRegex, 'Invalid ID format'),
   }),
   body: z.object({
-    email: z.string().email('Invalid email format').optional(),
+    email: z.string().trim().email('Invalid email format').optional(),
     phone: z
       .string()
+      .trim()
       .regex(phoneRegex, 'Phone number must be 10 digits')
       .optional(),
     password: z
@@ -58,33 +60,35 @@ const updateDetailsSchema = z.object({
       .min(8, 'Password must be at least 8 characters long')
       .optional(),
     enrollmentNo: z.coerce.number().int().positive().optional(),
-    firstName: z.string().min(1).optional(),
-    lastName: z.string().min(1).optional(),
+    firstName: z.string().trim().min(1).optional(),
+    lastName: z.string().trim().min(1).optional(),
     semester: z.coerce.number().int().min(1).max(8).optional(),
     branchId: z
       .string()
+      .trim()
       .regex(objectIdRegex, 'Invalid Branch ID format')
       .optional(),
-    address: z.string().min(1).optional(),
-    city: z.string().min(1).optional(),
-    state: z.string().min(1).optional(),
+    address: z.string().trim().min(1).optional(),
+    city: z.string().trim().min(1).optional(),
+    state: z.string().trim().min(1).optional(),
     pincode: z
       .string()
+      .trim()
       .regex(pincodeRegex, 'Pincode must be 6 digits')
       .optional(),
-    country: z.string().min(1).optional(),
+    country: z.string().trim().min(1).optional(),
   }),
 });
 
 const forgetPasswordSchema = z.object({
   body: z.object({
-    email: z.string().email('Invalid email format'),
+    email: z.string().trim().email('Invalid email format'),
   }),
 });
 
 const updatePasswordSchema = z.object({
   params: z.object({
-    resetId: z.string().regex(objectIdRegex, 'Invalid Reset ID format'),
+    resetId: z.string().trim().regex(objectIdRegex, 'Invalid Reset ID format'),
   }),
   body: z.object({
     password: z.string().min(8, 'Password must be at least 8 characters long'),
@@ -104,10 +108,11 @@ const searchStudentsSchema = z.object({
   query: z
     .object({
       enrollmentNo: z.coerce.number().int().positive().optional(),
-      name: z.string().min(1).optional(),
+      name: z.string().trim().min(1).optional(),
       semester: z.coerce.number().int().min(1).max(8).optional(),
       branch: z
         .string()
+        .trim()
         .regex(objectIdRegex, 'Invalid Branch ID format')
         .optional(),
     })
@@ -118,7 +123,7 @@ const searchStudentsSchema = z.object({
 
 const deleteStudentSchema = z.object({
   params: z.object({
-    id: z.string().regex(objectIdRegex, 'Invalid ID format'),
+    id: z.string().trim().regex(objectIdRegex, 'Invalid ID format'),
   }),
 });
 

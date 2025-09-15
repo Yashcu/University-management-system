@@ -23,7 +23,6 @@ const {
   getMyDetailsController,
   sendForgetPasswordEmail,
   updatePasswordHandler,
-  searchStudentsController,
   updateLoggedInPasswordController,
 } = require('../../controllers/details/student-details.controller');
 
@@ -36,7 +35,9 @@ router.post(
 router.post('/login', validate(loginStudentSchema), loginStudentController);
 router.get('/my-details', auth, getMyDetailsController);
 
-router.get('/', auth, getAllDetailsController);
+// This route now handles both getting all students and searching
+router.get('/', auth, validate(searchStudentsSchema), getAllDetailsController);
+
 router.patch(
   '/:id',
   auth,
@@ -65,12 +66,6 @@ router.post(
   auth,
   validate(changePasswordSchema),
   updateLoggedInPasswordController
-);
-router.get(
-  '/search',
-  auth,
-  validate(searchStudentsSchema),
-  searchStudentsController
 );
 
 module.exports = router;

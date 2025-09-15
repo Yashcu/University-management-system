@@ -1,4 +1,5 @@
 const Timetable = require('../models/timetable.model');
+const ApiError = require('../utils/ApiError');
 
 const getTimetables = async (queryParams) => {
   const { semester, branch } = queryParams;
@@ -12,9 +13,7 @@ const getTimetables = async (queryParams) => {
     .sort({ createdAt: -1 });
 
   if (!timetables || timetables.length === 0) {
-    const err = new Error('No timetables found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No timetables found');
   }
   return timetables;
 };
@@ -23,9 +22,7 @@ const addTimetable = async (timetableData, file) => {
   const { semester, branch } = timetableData;
 
   if (!file) {
-    const err = new Error('Timetable file is required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Timetable file is required');
   }
 
   let timetable = await Timetable.findOne({ semester, branch });
@@ -62,9 +59,7 @@ const updateTimetable = async (timetableId, timetableData, file) => {
   );
 
   if (!timetable) {
-    const err = new Error('Timetable not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Timetable not found');
   }
   return timetable;
 };
@@ -73,9 +68,7 @@ const deleteTimetable = async (timetableId) => {
   const timetable = await Timetable.findByIdAndDelete(timetableId);
 
   if (!timetable) {
-    const err = new Error('Timetable not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Timetable not found');
   }
   return timetable;
 };

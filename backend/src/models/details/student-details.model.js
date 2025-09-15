@@ -32,11 +32,13 @@ const studentDetailsSchema = new mongoose.Schema(
     semester: {
       type: Number,
       required: true,
+      index: true,
     },
     branchId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Branch',
       required: true,
+      index: true,
     },
     gender: {
       type: String,

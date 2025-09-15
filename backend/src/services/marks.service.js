@@ -1,5 +1,6 @@
 const Marks = require('../models/marks.model');
 const Student = require('../models/details/student-details.model');
+const ApiError = require('../utils/ApiError');
 
 const getMarks = async (queryParams) => {
   const { studentId, semester, examId } = queryParams;
@@ -29,16 +30,12 @@ const addMarks = async (marksData) => {
   const { studentId, semester, branch, marks } = marksData;
 
   if (!studentId || !semester || !branch || !marks || !Array.isArray(marks)) {
-    const err = new Error('Invalid input data');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Invalid input data');
   }
 
   const student = await Student.findById(studentId);
   if (!student) {
-    const err = new Error('Student not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Student not found');
   }
 
   let existingMarks = await Marks.findOne({ student: studentId, semester });
@@ -61,9 +58,7 @@ const deleteMarks = async (marksId) => {
   const deletedMarks = await Marks.findByIdAndDelete(marksId);
 
   if (!deletedMarks) {
-    const err = new Error('Marks not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Marks not found');
   }
   return deletedMarks;
 };

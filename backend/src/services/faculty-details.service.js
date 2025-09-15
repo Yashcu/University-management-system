@@ -5,22 +5,19 @@ const jwt = require('jsonwebtoken');
 const sendResetMail = require('../utils/SendMail');
 const config = require('../config');
 const { USER_ROLES, JWT_EXPIRATION } = require('../utils/constants');
+const ApiError = require('../utils/ApiError');
 
 const loginFaculty = async (loginData) => {
   const { email, password } = loginData;
   const user = await facultyDetails.findOne({ email });
 
   if (!user) {
-    const err = new Error('User not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'User not found');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    const err = new Error('Invalid password');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'Invalid password');
   }
 
   const payload = { userId: user._id, role: USER_ROLES.FACULTY };
@@ -33,9 +30,7 @@ const loginFaculty = async (loginData) => {
 const getAllFaculty = async () => {
   const users = await facultyDetails.find().select('-__v -password');
   if (!users || users.length === 0) {
-    const err = new Error('No Faculty Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Faculty Found');
   }
   return users;
 };
@@ -47,9 +42,7 @@ const registerFaculty = async (facultyData, file) => {
     $or: [{ phone }, { email }],
   });
   if (existing) {
-    const err = new Error('Faculty with these details already exists');
-    err.status = 409;
-    throw err;
+    throw new ApiError(409, 'Faculty with these details already exists');
   }
 
   const employeeId = Math.floor(100000 + Math.random() * 900000);
@@ -73,9 +66,7 @@ const updateFaculty = async (facultyId, facultyData, file) => {
       email,
     });
     if (existing) {
-      const err = new Error('Email already in use');
-      err.status = 409;
-      throw err;
+      throw new ApiError(409, 'Email already in use');
     }
   }
 
@@ -85,9 +76,7 @@ const updateFaculty = async (facultyId, facultyData, file) => {
       phone,
     });
     if (existing) {
-      const err = new Error('Phone number already in use');
-      err.status = 409;
-      throw err;
+      throw new ApiError(409, 'Phone number already in use');
     }
   }
 
@@ -109,50 +98,38 @@ const updateFaculty = async (facultyId, facultyData, file) => {
     .select('-__v -password');
 
   if (!updatedUser) {
-    const err = new Error('Faculty not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'Faculty not found');
   }
   return updatedUser;
 };
 
 const deleteFaculty = async (facultyId) => {
   if (!facultyId) {
-    const err = new Error('Faculty ID is required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Faculty ID is required');
   }
 
   const user = await facultyDetails.findByIdAndDelete(facultyId);
   if (!user) {
-    const err = new Error('No Faculty Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Faculty Found');
   }
 };
 
 const getMyFacultyDetails = async (userId) => {
   const user = await facultyDetails.findById(userId).select('-__v -password');
   if (!user) {
-    const err = new Error('User not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'User not found');
   }
   return user;
 };
 
 const sendFacultyResetPasswordEmail = async (email) => {
   if (!email) {
-    const err = new Error('Email is required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Email is required');
   }
 
   const user = await facultyDetails.findOne({ email });
   if (!user) {
-    const err = new Error('No Faculty Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Faculty Found');
   }
 
   const resetTkn = jwt.sign({ _id: user._id }, config.jwtSecret, {
@@ -172,23 +149,17 @@ const sendFacultyResetPasswordEmail = async (email) => {
 
 const updateFacultyPassword = async (resetId, password) => {
   if (!resetId || !password) {
-    const err = new Error('Password and ResetId are required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Password and ResetId are required');
   }
 
   const resetTkn = await resetToken.findById(resetId);
   if (!resetTkn) {
-    const err = new Error('No Reset Request Found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'No Reset Request Found');
   }
 
   const verifyToken = jwt.verify(resetTkn.resetToken, config.jwtSecret);
   if (!verifyToken) {
-    const err = new Error('Token Expired or Invalid');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'Token Expired or Invalid');
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -205,29 +176,21 @@ const updateFacultyPassword = async (resetId, password) => {
 
 const updateLoggedInPassword = async (userId, currentPassword, newPassword) => {
   if (!currentPassword || !newPassword) {
-    const err = new Error('Current password and new password are required');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'Current password and new password are required');
   }
 
   if (newPassword.length < 8) {
-    const err = new Error('New password must be at least 8 characters long');
-    err.status = 400;
-    throw err;
+    throw new ApiError(400, 'New password must be at least 8 characters long');
   }
 
   const user = await facultyDetails.findById(userId);
   if (!user) {
-    const err = new Error('User not found');
-    err.status = 404;
-    throw err;
+    throw new ApiError(404, 'User not found');
   }
 
   const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
   if (!isPasswordValid) {
-    const err = new Error('Current password is incorrect');
-    err.status = 401;
-    throw err;
+    throw new ApiError(401, 'Current password is incorrect');
   }
 
   const salt = await bcrypt.genSalt(10);
