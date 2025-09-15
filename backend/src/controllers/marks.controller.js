@@ -5,12 +5,7 @@ const { USER_ROLES } = require('../utils/constants');
 const getMarksController = async (req, res, next) => {
   try {
     const marks = await marksService.getMarks(req.query);
-    // Note: This controller has a custom success response structure
-    res.json({
-      success: true,
-      message: 'Marks retrieved successfully',
-      data: marks,
-    });
+    return ApiResponse.success(marks, 'Marks retrieved successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -19,11 +14,7 @@ const getMarksController = async (req, res, next) => {
 const addMarksController = async (req, res, next) => {
   try {
     const existingMarks = await marksService.addMarks(req.body);
-    res.json({
-      success: true,
-      message: 'Marks updated successfully',
-      data: existingMarks,
-    });
+    return ApiResponse.success(existingMarks, 'Marks updated successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -32,10 +23,7 @@ const addMarksController = async (req, res, next) => {
 const deleteMarksController = async (req, res, next) => {
   try {
     await marksService.deleteMarks(req.params.id);
-    res.json({
-      success: true,
-      message: 'Marks deleted successfully',
-    });
+    return ApiResponse.success(null, 'Marks deleted successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -49,9 +37,7 @@ const addBulkMarksController = async (req, res, next) => {
       ).send(res);
     }
     const results = await marksService.addBulkMarks(req.body);
-    return ApiResponse.success(results, 'Marks submitted successfully').send(
-      res
-    );
+    return ApiResponse.success(results, 'Marks submitted successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -62,11 +48,7 @@ const getStudentsWithMarksController = async (req, res, next) => {
     const studentsWithMarks = await marksService.getStudentsWithMarks(
       req.query
     );
-    res.json({
-      success: true,
-      message: 'Students retrieved successfully with marks',
-      data: studentsWithMarks,
-    });
+    return ApiResponse.success(studentsWithMarks,'Students retrieved successfully with marks').send(res);
   } catch (error) {
     next(error);
   }
@@ -75,11 +57,7 @@ const getStudentsWithMarksController = async (req, res, next) => {
 const getStudentMarksController = async (req, res, next) => {
   try {
     const marks = await marksService.getStudentMarks(req.query, req.userId);
-    res.json({
-      success: true,
-      message: 'Marks retrieved successfully',
-      data: marks,
-    });
+    return ApiResponse.success(marks, 'Marks retrieved successfully').send(res);
   } catch (error) {
     next(error);
   }
