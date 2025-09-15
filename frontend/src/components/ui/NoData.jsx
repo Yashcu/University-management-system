@@ -1,4 +1,6 @@
-const NoData = ({ title, message }) => {
+import React from 'react';
+
+const NoData = React.memo(({ title, message }) => {
   return (
     <div className="flex flex-col items-center justify-center h-full my-20 text-center">
       <img
@@ -14,6 +16,6 @@ const NoData = ({ title, message }) => {
       </p>
     </div>
   );
-};
+});
 
 export default NoData;

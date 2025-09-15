@@ -1,7 +1,7 @@
 import React from 'react';
 import CustomButton from './CustomButton';
 
-const DeleteConfirm = ({ isOpen, onClose, onConfirm, message }) => {
+const DeleteConfirm = React.memo(({ isOpen, onClose, onConfirm, message }) => {
   if (!isOpen) return null;
 
   return (
@@ -31,6 +31,6 @@ const DeleteConfirm = ({ isOpen, onClose, onConfirm, message }) => {
       </div>
     </div>
   );
-};
+});
 
 export default DeleteConfirm;

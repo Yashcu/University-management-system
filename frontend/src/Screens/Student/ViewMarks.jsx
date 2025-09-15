@@ -1,39 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import React from 'react';
 import Heading from '../../components/ui/Heading';
 import Loading from '../../components/ui/Loading';
 import NoData from '../../components/ui/NoData';
-import { marksService } from '../../services/marksService';
+import { useMarks } from '../../hooks/useMarks';
 
 const ViewMarks = () => {
-  const [marks, setMarks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const getMarks = async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await marksService.getStudentMarks();
-      setMarks(data?.data || []);
-    } catch (error) {
-      toast.error('Failed to fetch marks');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getMarks();
-  }, []);
-
-  // Group marks by exam
-  const groupedMarks = marks.reduce((acc, mark) => {
-    const examName = mark.exam?.name || 'Unknown Exam';
-    if (!acc[examName]) {
-      acc[examName] = [];
-    }
-    acc[examName].push(mark);
-    return acc;
-  }, {});
+  const { isLoading, groupedMarks } = useMarks();
 
   return (
     <div>

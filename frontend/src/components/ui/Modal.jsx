@@ -1,6 +1,7 @@
+import React from 'react';
 import { IoMdClose } from 'react-icons/io';
 
-const Modal = ({ title, isOpen, onClose, children }) => {
+const Modal = React.memo(({ title, isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
@@ -17,6 +18,6 @@ const Modal = ({ title, isOpen, onClose, children }) => {
       </div>
     </div>
   );
-};
+});
 
 export default Modal;
