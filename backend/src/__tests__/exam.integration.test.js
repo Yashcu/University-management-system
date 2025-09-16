@@ -59,7 +59,6 @@ describe('Exam API - Integration Tests', () => {
         .field('semester', '1')
         .field('examType', 'end')
         .field('totalMarks', '75')
-      .attach('file', path.resolve(__dirname, '../../test-media/mock.jpg'))
 
       expect(response.statusCode).toBe(403);
     });
