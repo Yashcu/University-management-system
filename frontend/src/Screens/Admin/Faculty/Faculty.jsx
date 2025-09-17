@@ -11,6 +11,14 @@ import { useCrud } from '../../../hooks/useCrud';
 import FacultyForm from './FacultyForm';
 import FacultyTable from './FacultyTable';
 import toast from 'react-hot-toast';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const Faculty = () => {
   const [branches, setBranches] = useState([]);
@@ -55,6 +63,10 @@ const Faculty = () => {
     fetchData(searchParams);
   };
 
+  const handleBranchChange = (value) => {
+    setSearchParams({ ...searchParams, branch: value === 'all' ? '' : value});
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -66,29 +78,28 @@ const Faculty = () => {
         onSubmit={handleSearch}
         className="mb-6 p-4 bg-white rounded-md shadow-md grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
       >
-        <input
+        <Input
           type="text"
           placeholder="Search by name..."
           value={searchParams.name}
           onChange={(e) =>
             setSearchParams({ ...searchParams, name: e.target.value })
           }
-          className="px-4 py-2 border rounded-md"
         />
-        <select
-          value={searchParams.branch}
-          onChange={(e) =>
-            setSearchParams({ ...searchParams, branch: e.target.value })
-          }
-          className="px-4 py-2 border rounded-md"
-        >
-          <option value="">All Branches</option>
-          {branches.map((b) => (
-            <option key={b._id} value={b._id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
+        <Select onValueChange={handleBranchChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="All Branches" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Branches</SelectItem>
+            {branches.map((b) => (
+              <SelectItem key={b._id} value={b._id}>
+                {b.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <CustomButton type="submit">Search</CustomButton>
       </form>
 

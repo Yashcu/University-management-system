@@ -1,76 +1,138 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import CustomButton from '../../../components/ui/CustomButton';
-
-// Define a schema for file validation
-const MAX_FILE_SIZE = 5000000; // 5MB
-const ACCEPTED_FILE_TYPES = [
-  'image/jpeg',
-  'image/jpg',
-  'image/png',
-  'image/webp',
-  'application/pdf',
-];
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const timetableSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  branchId: z.string().min(1, 'Branch must be selected'),
+  semester: z.string().min(1, 'Semester is required'),
   file: z
     .any()
-    .refine((files) => files?.length == 1, 'File is required.')
-    .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Max file size is 5MB.`
-    )
-    .refine(
-      (files) => ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
-      '.jpg, .jpeg, .png, .webp, and .pdf files are accepted.'
-    ),
+    .refine((files) => files?.length == 1, "File is required.")
 });
 
-const TimetableForm = ({ onAdd, onCancel, isProcessing }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+const TimetableForm = ({ onUpsert, onCancel, isProcessing, branches }) => {
+  const form = useForm({
     resolver: zodResolver(timetableSchema),
+    defaultValues: {
+      title: '',
+      branchId: '',
+      semester: '',
+      file: undefined,
+    },
   });
 
   const onSubmit = (data) => {
     const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('branchId', data.branchId);
+    formData.append('semester', data.semester);
     formData.append('file', data.file[0]);
-    onAdd(formData);
+    onUpsert(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Timetable File (Image/PDF)
-        </label>
-        <input
-          {...register('file')}
-          type="file"
-          className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., Final Year Timetable" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.file && (
-          <p className="text-red-500 text-xs mt-1">{errors.file.message}</p>
-        )}
-      </div>
-      <div className="flex justify-end gap-4 pt-4 border-t mt-6">
-        <CustomButton type="button" variant="secondary" onClick={onCancel}>
-          Cancel
-        </CustomButton>
-        <CustomButton
-          type="submit"
-          loading={isProcessing}
-          disabled={isProcessing}
-        >
-          Upload
-        </CustomButton>
-      </div>
-    </form>
+        <FormField
+          control={form.control}
+          name="branchId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Branch</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a branch" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {branches.map((b) => (
+                    <SelectItem key={b._id} value={b._id}>
+                      {b.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="semester"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Semester</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="e.g., 8" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="file"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Timetable File (PDF)</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => field.onChange(e.target.files)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-end gap-4 pt-4 border-t mt-6">
+          <CustomButton type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </CustomButton>
+          <CustomButton
+            type="submit"
+            loading={isProcessing}
+            disabled={isProcessing}
+          >
+            Upload Timetable
+          </CustomButton>
+        </div>
+      </form>
+    </Form>
   );
 };
 

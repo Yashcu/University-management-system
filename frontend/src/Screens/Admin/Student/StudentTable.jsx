@@ -1,66 +1,65 @@
 import React from 'react';
-import CustomButton from '../../../components/ui/CustomButton';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import CustomButton from '../../../components/ui/CustomButton'; // Your custom button
 
 const StudentTable = ({ students, onEdit, onDelete }) => {
   const mediaUrl = import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
 
   return (
-    <div className="overflow-x-auto mt-6">
-      <table className="min-w-full bg-white shadow-md rounded-lg">
-        <thead className="bg-gray-800 text-white">
-          <tr>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Profile
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Student ID
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Name
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Email
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Branch
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-center">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-700">
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[80px]">Profile</TableHead>
+            <TableHead>Student ID</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Branch</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {students.map((student) => (
-            <tr key={student._id} className="border-b hover:bg-gray-50">
-              <td className="py-3 px-4">
-                <img
-                  src={student.profile ? `${mediaUrl}/media/${student.profile}` : '/assets/avatar.png'}
-                  alt={`${student.firstName} ${student.lastName}`}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-              </td>
-              <td className="py-3 px-4">{student.enrollmentNo}</td>
-              <td className="py-3 px-4">{`${student.firstName} ${student.lastName}`}</td>
-              <td className="py-3 px-4">{student.email}</td>
-              <td className="py-3 px-4">{student.branchId?.name || 'N/A'}</td>
-              <td className="py-3 px-4 flex justify-center gap-2">
+            <TableRow key={student._id}>
+              <TableCell>
+                <Avatar>
+                  <AvatarImage src={student.profile ? `${mediaUrl}/media/${student.profile}` : '/assets/avatar.png'} alt={`${student.firstName} ${student.lastName}`} />
+                  <AvatarFallback>{student.firstName?.[0]}{student.lastName?.[0]}</AvatarFallback>
+                </Avatar>
+              </TableCell>
+              <TableCell>{student.enrollmentNo}</TableCell>
+              <TableCell>{`${student.firstName} ${student.lastName}`}</TableCell>
+              <TableCell>{student.email}</TableCell>
+              <TableCell>{student.branchId?.name || 'N/A'}</TableCell>
+              <TableCell className="text-right">
                 <CustomButton
-                  variant="secondary"
+                  variant="outline"
+                  size="sm"
                   onClick={() => onEdit(student)}
+                  className="mr-2"
                 >
                   Edit
                 </CustomButton>
                 <CustomButton
-                  variant="danger"
+                  variant="destructive"
+                  size="sm"
                   onClick={() => onDelete(student)}
                 >
                   Delete
                 </CustomButton>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };

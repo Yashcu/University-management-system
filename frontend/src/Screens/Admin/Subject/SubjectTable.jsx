@@ -1,54 +1,55 @@
 import React from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import CustomButton from '../../../components/ui/CustomButton';
 
 const SubjectTable = ({ subjects, onEdit, onDelete }) => {
   return (
-    <div className="overflow-x-auto mt-6">
-      <table className="min-w-full bg-white shadow-md rounded-lg">
-        <thead className="bg-gray-800 text-white">
-          <tr>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Subject Name
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Code
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Branch
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Semester
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-center">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-700">
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Subject Name</TableHead>
+            <TableHead>Subject Code</TableHead>
+            <TableHead>Branch</TableHead>
+            <TableHead>Semester</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {subjects.map((subject) => (
-            <tr key={subject._id} className="border-b hover:bg-gray-50">
-              <td className="py-3 px-4">{subject.name}</td>
-              <td className="py-3 px-4">{subject.subjectCode}</td>
-              <td className="py-3 px-4">{subject.branch?.name || 'N/A'}</td>
-              <td className="py-3 px-4">{subject.semester}</td>
-              <td className="py-3 px-4 flex justify-center gap-2">
+            <TableRow key={subject._id}>
+              <TableCell className="font-medium">{subject.name}</TableCell>
+              <TableCell>{subject.code}</TableCell>
+              <TableCell>{subject.branchId?.name || 'N/A'}</TableCell>
+              <TableCell>{subject.semester}</TableCell>
+              <TableCell className="text-right">
                 <CustomButton
-                  variant="secondary"
+                  variant="outline"
+                  size="sm"
                   onClick={() => onEdit(subject)}
+                  className="mr-2"
                 >
                   Edit
                 </CustomButton>
                 <CustomButton
-                  variant="danger"
+                  variant="destructive"
+                  size="sm"
                   onClick={() => onDelete(subject)}
                 >
                   Delete
                 </CustomButton>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };

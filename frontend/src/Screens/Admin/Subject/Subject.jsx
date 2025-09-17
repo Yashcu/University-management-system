@@ -11,9 +11,12 @@ import { useCrud } from '../../../hooks/useCrud';
 import SubjectForm from './SubjectForm';
 import SubjectTable from './SubjectTable';
 import toast from 'react-hot-toast';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const Subject = () => {
   const [branches, setBranches] = useState([]);
+  const [searchParams, setSearchParams] = useState({ name: '', branch: '' });
 
   const {
     data: subjects,
@@ -42,9 +45,21 @@ const Subject = () => {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    fetchData(searchParams);
+  }, [fetchData, searchParams]);
+
+  useEffect(() => {
     getBranches();
-  }, [fetchData, getBranches]);
+  }, [getBranches]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchData(searchParams);
+  };
+
+  const handleBranchChange = (value) => {
+    setSearchParams({ ...searchParams, branch: value === 'all' ? '' : value });
+  };
 
   return (
     <div>
@@ -52,6 +67,34 @@ const Subject = () => {
         <Heading title="Manage Subjects" />
         <CustomButton onClick={() => openModal()}>Add Subject</CustomButton>
       </div>
+
+      <form
+        onSubmit={handleSearch}
+        className="mb-6 p-4 bg-white rounded-md shadow-md grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+      >
+        <Input
+          type="text"
+          placeholder="Search by name..."
+          value={searchParams.name}
+          onChange={(e) =>
+            setSearchParams({ ...searchParams, name: e.target.value })
+          }
+        />
+        <Select onValueChange={handleBranchChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="All Branches" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Branches</SelectItem>
+            {branches.map((b) => (
+              <SelectItem key={b._id} value={b._id}>
+                {b.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <CustomButton type="submit">Search</CustomButton>
+      </form>
 
       {isLoading ? (
         <Loading />

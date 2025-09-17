@@ -1,62 +1,63 @@
 import React from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CustomButton from '../../../components/ui/CustomButton';
 
 const FacultyTable = ({ faculties, onEdit, onDelete }) => {
   const mediaUrl = import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
 
   return (
-    <div className="overflow-x-auto mt-6">
-      <table className="min-w-full bg-white shadow-md rounded-lg">
-        <thead className="bg-gray-800 text-white">
-          <tr>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Profile
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Name
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Email
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-              Branch
-            </th>
-            <th className="py-3 px-4 uppercase font-semibold text-sm text-center">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-700">
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[80px]">Profile</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Branch</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {faculties.map((faculty) => (
-            <tr key={faculty._id} className="border-b hover:bg-gray-50">
-              <td className="py-3 px-4">
-                <img
-                  src={faculty.profile ? `${mediaUrl}/media/${faculty.profile}` : '/assets/avatar.png'}
-                  alt={`${faculty.firstName} ${faculty.lastName}`}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-              </td>
-              <td className="py-3 px-4">{`${faculty.firstName} ${faculty.lastName}`}</td>
-              <td className="py-3 px-4">{faculty.email}</td>
-              <td className="py-3 px-4">{faculty.branchId?.name || 'N/A'}</td>
-              <td className="py-3 px-4 flex justify-center gap-2">
+            <TableRow key={faculty._id}>
+              <TableCell>
+                <Avatar>
+                  <AvatarImage src={faculty.profile ? `${mediaUrl}/media/${faculty.profile}` : '/assets/avatar.png'} alt={`${faculty.firstName} ${faculty.lastName}`} />
+                  <AvatarFallback>{faculty.firstName?.[0]}{faculty.lastName?.[0]}</AvatarFallback>
+                </Avatar>
+              </TableCell>
+              <TableCell>{`${faculty.firstName} ${faculty.lastName}`}</TableCell>
+              <TableCell>{faculty.email}</TableCell>
+              <TableCell>{faculty.branchId?.name || 'N/A'}</TableCell>
+              <TableCell className="text-right">
                 <CustomButton
-                  variant="secondary"
+                  variant="outline"
+                  size="sm"
                   onClick={() => onEdit(faculty)}
+                  className="mr-2"
                 >
                   Edit
                 </CustomButton>
                 <CustomButton
-                  variant="danger"
+                  variant="destructive"
+                  size="sm"
                   onClick={() => onDelete(faculty)}
                 >
                   Delete
                 </CustomButton>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };

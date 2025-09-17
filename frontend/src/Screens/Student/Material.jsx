@@ -1,111 +1,113 @@
-import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect, useCallback } from 'react';
 import Heading from '../../components/ui/Heading';
 import Loading from '../../components/ui/Loading';
 import NoData from '../../components/ui/NoData';
-import { subjectService } from '../../services/subjectService';
 import { materialService } from '../../services/materialService';
-import { profileService } from '../../services/profileService';
+import { subjectService } from '../../services/subjectService'; // To fetch subjects for filtering
+import toast from 'react-hot-toast';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Download } from 'lucide-react';
 
 const Material = () => {
   const [materials, setMaterials] = useState([]);
   const [subjects, setSubjects] = useState([]);
-  const [studentBranch, setStudentBranch] = useState(null);
-  const [selectedSubject, setSelectedSubject] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
+  const mediaUrl = import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
 
-  const getStudentProfileAndSubjects = async () => {
-    setIsLoading(true);
+  const getSubjects = useCallback(async () => {
     try {
-      const profileRes = await profileService.getProfile();
-      const branchId = profileRes.data?.data?.branch?._id;
-      setStudentBranch(branchId);
-
-      if (branchId) {
-        const subjectRes = await subjectService.getAllSubjects({
-          branch: branchId,
-        });
-        setSubjects(subjectRes.data?.data || []);
-      }
+      // API should fetch subjects relevant to the student
+      const { data } = await subjectService.search();
+      setSubjects(data?.data || []);
     } catch (error) {
-      toast.error('Failed to fetch profile and subjects');
-    } finally {
-      setIsLoading(false);
+      toast.error('Failed to fetch subjects.');
     }
-  };
-
-  useEffect(() => {
-    getStudentProfileAndSubjects();
   }, []);
 
-  const getMaterials = async () => {
-    if (!selectedSubject) return;
+  const getMaterials = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data } =
-        await materialService.getMaterialsBySubject(selectedSubject);
+      const params = { subject: selectedSubject === 'all' ? '' : selectedSubject };
+      const { data } = await materialService.search(params);
       setMaterials(data?.data || []);
     } catch (error) {
-      toast.error('Failed to fetch materials');
-      setMaterials([]);
+      toast.error('Failed to fetch study materials.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedSubject]);
+
+  useEffect(() => {
+    getSubjects();
+  }, [getSubjects]);
 
   useEffect(() => {
     getMaterials();
-  }, [selectedSubject]);
+  }, [getMaterials]);
 
   return (
     <div>
-      <Heading title="Study Material" />
+      <Heading title="Study Materials" />
 
-      <div className="mt-6">
-        <label className="block text-sm font-medium">
-          Select Subject to View Materials
-        </label>
-        <select
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
-          className="w-full md:w-1/3 px-4 py-2 border rounded-md"
-        >
-          <option value="">Select Subject</option>
-          {subjects.map((sub) => (
-            <option key={sub._id} value={sub._id}>
-              {sub.name}
-            </option>
-          ))}
-        </select>
+      <div className="my-6 max-w-sm">
+        <Select onValueChange={setSelectedSubject} defaultValue="all">
+          <SelectTrigger>
+            <SelectValue placeholder="Filter by Subject" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Subjects</SelectItem>
+            {subjects.map((subject) => (
+              <SelectItem key={subject._id} value={subject._id}>
+                {subject.name} ({subject.code})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {isLoading ? (
         <Loading />
-      ) : !selectedSubject ? (
-        <p className="text-center mt-8 text-gray-500">
-          Please select a subject to see materials.
-        </p>
-      ) : materials.length === 0 ? (
-        <NoData />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {materials.map((material) => (
-            <div
-              key={material._id}
-              className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center"
-            >
-              <h4 className="font-semibold">{material.title}</h4>
-              <a
-                href={material.file.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:underline text-sm"
-              >
-                Download
-              </a>
-            </div>
-          ))}
+      ) : materials.length > 0 ? (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Subject</TableHead>
+                <TableHead className="text-right">Download</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {materials.map((material) => (
+                <TableRow key={material._id}>
+                  <TableCell className="font-medium">{material.title}</TableCell>
+                  <TableCell>{material.subjectId?.name || 'N/A'}</TableCell>
+                  <TableCell className="text-right">
+                    <a
+                      href={`${mediaUrl}/media/${material.file}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-100"
+                    >
+                      <Download className="h-5 w-5 text-gray-700" />
+                    </a>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
+      ) : (
+        <NoData message="No study materials found for the selected subject." />
       )}
     </div>
   );

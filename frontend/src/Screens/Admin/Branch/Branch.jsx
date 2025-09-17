@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Heading from '../../../components/ui/Heading';
 import Loading from '../../../components/ui/Loading';
 import NoData from '../../../components/ui/NoData';
@@ -26,11 +26,7 @@ const Branch = () => {
     closeDeleteConfirm,
     handleUpsert,
     handleDelete,
-  } = useCrud(branchService);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  } = useCrud(branchService, { fetchOnMount: true });
 
   return (
     <div>
@@ -42,7 +38,7 @@ const Branch = () => {
       {isLoading ? (
         <Loading />
       ) : branches.length === 0 ? (
-        <NoData message="No branches found. Add a new one to get started." />
+        <NoData />
       ) : (
         <BranchTable
           branches={branches}
@@ -72,7 +68,6 @@ const Branch = () => {
           isOpen={isDeleteConfirmOpen}
           onClose={closeDeleteConfirm}
           onConfirm={handleDelete}
-          message="Are you sure you want to delete this branch? This action cannot be undone."
         />
       )}
     </div>

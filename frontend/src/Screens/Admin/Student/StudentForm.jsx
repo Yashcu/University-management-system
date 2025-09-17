@@ -3,6 +3,23 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import CustomButton from '../../../components/ui/CustomButton';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 
 const studentSchema = z.object({
   studentId: z.string().min(1, 'Student ID is required'),
@@ -21,28 +38,38 @@ const StudentForm = ({
   isProcessing,
   branches,
 }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-    watch,
-  } = useForm({
+  const form = useForm({
     resolver: zodResolver(studentSchema),
+    defaultValues: {
+      studentId: selectedItem?.studentId || '',
+      name: selectedItem?.name || '',
+      email: selectedItem?.email || '',
+      phone: selectedItem?.phone || '',
+      branch: selectedItem?.branch?._id || '',
+      profilePic: null,
+    },
   });
 
   useEffect(() => {
     if (isEditing && selectedItem) {
-      setValue('studentId', selectedItem.studentId || '');
-      setValue('name', selectedItem.name || '');
-      setValue('email', selectedItem.email || '');
-      setValue('phone', selectedItem.phone || '');
-      setValue('branch', selectedItem.branch?._id || '');
+      form.reset({
+        studentId: selectedItem.studentId || '',
+        name: selectedItem.name || '',
+        email: selectedItem.email || '',
+        phone: selectedItem.phone || '',
+        branch: selectedItem.branch?._id || '',
+      });
     } else {
-      reset();
+      form.reset({
+        studentId: '',
+        name: '',
+        email: '',
+        phone: '',
+        branch: '',
+        profilePic: null,
+      });
     }
-  }, [isEditing, selectedItem, setValue, reset]);
+  }, [isEditing, selectedItem, form]);
 
   const onSubmit = (data) => {
     const formData = new FormData();
@@ -59,94 +86,114 @@ const StudentForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <label>Student ID</label>
-        <input
-          {...register('studentId')}
-          className="w-full px-4 py-2 border rounded-md"
-          disabled={isEditing}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="studentId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Student ID</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter student ID" {...field} disabled={isEditing} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.studentId && (
-          <p className="text-red-500 text-xs mt-1">
-            {errors.studentId.message}
-          </p>
-        )}
-      </div>
-      <div>
-        <label>Full Name</label>
-        <input
-          {...register('name')}
-          className="w-full px-4 py-2 border rounded-md"
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Full Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter full name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.name && (
-          <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
-        )}
-      </div>
-      <div>
-        <label>Email</label>
-        <input
-          {...register('email')}
-          type="email"
-          className="w-full px-4 py-2 border rounded-md"
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="m@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.email && (
-          <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
-        )}
-      </div>
-      <div>
-        <label>Phone</label>
-        <input
-          {...register('phone')}
-          className="w-full px-4 py-2 border rounded-md"
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter phone number" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.phone && (
-          <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
-        )}
-      </div>
-      <div>
-        <label>Branch</label>
-        <select
-          {...register('branch')}
-          className="w-full px-4 py-2 border rounded-md"
-        >
-          <option value="">Select Branch</option>
-          {branches.map((b) => (
-            <option key={b._id} value={b._id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
-        {errors.branch && (
-          <p className="text-red-500 text-xs mt-1">{errors.branch.message}</p>
-        )}
-      </div>
-      <div>
-        <label>Profile Picture</label>
-        <input
-          {...register('profilePic')}
-          type="file"
-          className="w-full px-4 py-2 border rounded-md"
+        <FormField
+          control={form.control}
+          name="branch"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Branch</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a branch" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {branches.map((b) => (
+                    <SelectItem key={b._id} value={b._id}>
+                      {b.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {!isEditing && !watch('profilePic') && (
-          <p className="text-red-500 text-xs mt-1">
-            Profile picture is required for new students.
-          </p>
-        )}
-      </div>
-      <div className="flex justify-end gap-4 pt-4 border-t mt-6">
-        <CustomButton type="button" variant="secondary" onClick={onCancel}>
-          Cancel
-        </CustomButton>
-        <CustomButton
-          type="submit"
-          loading={isProcessing}
-          disabled={isProcessing}
-        >
-          {isEditing ? 'Update Student' : 'Add Student'}
-        </CustomButton>
-      </div>
-    </form>
+        <FormField
+          control={form.control}
+          name="profilePic"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profile Picture</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  onChange={(e) => field.onChange(e.target.files)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-end gap-4 pt-4 border-t mt-6">
+          <CustomButton type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </CustomButton>
+          <CustomButton
+            type="submit"
+            loading={isProcessing}
+            disabled={isProcessing}
+          >
+            {isEditing ? 'Update Student' : 'Add Student'}
+          </CustomButton>
+        </div>
+      </form>
+    </Form>
   );
 };
 

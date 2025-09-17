@@ -3,6 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import CustomButton from '../components/ui/CustomButton';
 import { authService } from '../services/authService';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const UpdatePassword = () => {
   const [password, setPassword] = useState('');
@@ -42,55 +45,43 @@ const UpdatePassword = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form
-        className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
-        onSubmit={updatePasswordHandler}
-      >
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-          Update Password
-        </h2>
-        <div className="mb-4">
-          <label
-            htmlFor="password"
-            className="block text-gray-700 text-sm font-medium mb-2"
-          >
-            New Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter new password"
-          />
-        </div>
-        <div className="mb-6">
-          <label
-            htmlFor="confirmPassword"
-            className="block text-gray-700 text-sm font-medium mb-2"
-          >
-            Confirm New Password
-          </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Confirm new password"
-          />
-        </div>
-
-        <CustomButton
-          type="submit"
-          className="w-full"
-          loading={loading}
-          disabled={loading}
-        >
-          Update Password
-        </CustomButton>
-      </form>
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-2xl">Update Password</CardTitle>
+          <CardDescription>Enter your new password below.</CardDescription>
+        </CardHeader>
+        <form onSubmit={updatePasswordHandler}>
+          <CardContent className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="password">New Password</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <CustomButton className="w-full" type="submit" loading={loading} disabled={loading}>
+              Update Password
+            </CustomButton>
+          </CardFooter>
+        </form>
+      </Card>
       <Toaster position="bottom-center" />
     </div>
   );

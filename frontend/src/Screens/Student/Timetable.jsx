@@ -1,67 +1,81 @@
-import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect, useCallback } from 'react';
 import Heading from '../../components/ui/Heading';
 import Loading from '../../components/ui/Loading';
 import NoData from '../../components/ui/NoData';
-import { profileService } from '../../services/profileService';
 import { timetableService } from '../../services/timetableService';
+import toast from 'react-hot-toast';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Download } from 'lucide-react';
 
 const Timetable = () => {
-  const [timetable, setTimetable] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [timetables, setTimetables] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const mediaUrl = import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
 
-  const getTimetable = async () => {
+  const getTimetables = useCallback(async () => {
     setIsLoading(true);
     try {
-      const profileRes = await profileService.getProfile();
-      const branchId = profileRes.data?.data?.branch?._id;
-
-      if (branchId) {
-        const timetableRes =
-          await timetableService.getTimetableByBranch(branchId);
-        // Assuming one branch has only one timetable for simplicity
-        setTimetable(timetableRes.data?.data[0] || null);
-      } else {
-        toast.error('Branch information not found in your profile.');
-      }
+      const { data } = await timetableService.search();
+      setTimetables(data?.data || []);
     } catch (error) {
-      toast.error('Failed to fetch timetable.');
+      toast.error('Failed to fetch timetables.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    getTimetable();
-  }, []);
+    getTimetables();
+  }, [getTimetables]);
 
   return (
     <div>
-      <Heading title="My Timetable" />
-      {isLoading ? (
-        <Loading />
-      ) : !timetable ? (
-        <NoData message="Timetable has not been uploaded for your branch yet." />
-      ) : (
-        <div className="mt-6">
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold">
-              Timetable for {timetable.branch?.name}
-            </h3>
-            <div className="mt-4">
-              <iframe
-                src={timetable.file.url}
-                title="Timetable"
-                className="w-full h-screen border rounded-md"
-              >
-                Your browser does not support PDFs. Please download the file to
-                view it:
-                <a href={timetable.file.url}>Download PDF</a>
-              </iframe>
-            </div>
+      <Heading title="Class Timetable" />
+
+      <div className="my-6">
+        {isLoading ? (
+          <Loading />
+        ) : timetables.length > 0 ? (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Semester</TableHead>
+                  <TableHead className="text-right">Download</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {timetables.map((timetable) => (
+                  <TableRow key={timetable._id}>
+                    <TableCell className="font-medium">{timetable.title}</TableCell>
+                    <TableCell>{timetable.semester}</TableCell>
+                    <TableCell className="text-right">
+                      <a
+                        href={`${mediaUrl}/media/${timetable.file}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-100"
+                      >
+                        <Download className="h-5 w-5 text-gray-700" />
+                      </a>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
-        </div>
-      )}
+        ) : (
+          <NoData message="No timetables have been uploaded yet." />
+        )}
+      </div>
     </div>
   );
 };

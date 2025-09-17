@@ -1,151 +1,106 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import toast from 'react-hot-toast';
 import Heading from '../../../components/ui/Heading';
 import Loading from '../../../components/ui/Loading';
 import NoData from '../../../components/ui/NoData';
 import CustomButton from '../../../components/ui/CustomButton';
 import Modal from '../../../components/ui/Modal';
 import DeleteConfirm from '../../../components/ui/DeleteConfirm';
-import { subjectService } from '../../../services/subjectService';
 import { materialService } from '../../../services/materialService';
+import { subjectService } from '../../../services/subjectService';
+import { useCrud } from '../../../hooks/useCrud';
 import MaterialForm from './MaterialForm';
-import MaterialList from './MaterialList';
+import MaterialTable from './MaterialTable';
+import toast from 'react-hot-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const Material = () => {
-  const [materials, setMaterials] = useState([]);
   const [subjects, setSubjects] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [searchParams, setSearchParams] = useState({ subject: '' });
+
+  const {
+    data: materials,
+    isLoading,
+    isProcessing,
+    isModalOpen,
+    isDeleteConfirmOpen,
+    selectedItem,
+    fetchData,
+    openModal,
+    closeModal,
+    openDeleteConfirm,
+    closeDeleteConfirm,
+    handleUpsert,
+    handleDelete,
+  } = useCrud(materialService);
 
   const getSubjects = useCallback(async () => {
     try {
-      const { data } = await subjectService.search();
+      // Assuming you have a method to get subjects assigned to the logged-in faculty
+      const { data } = await subjectService.search(); // This might need adjustment based on your API
       setSubjects(data?.data || []);
     } catch (error) {
       toast.error('Failed to fetch subjects');
     }
   }, []);
 
-  const getMaterials = useCallback(async () => {
-    if (!selectedSubject) {
-      setMaterials([]);
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const { data } =
-        await materialService.getMaterialsBySubject(selectedSubject);
-      setMaterials(data?.data || []);
-    } catch (error) {
-      toast.error('Failed to fetch materials');
-      setMaterials([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedSubject]);
+  useEffect(() => {
+    fetchData(searchParams);
+  }, [fetchData, searchParams]);
 
   useEffect(() => {
     getSubjects();
   }, [getSubjects]);
 
-  useEffect(() => {
-    getMaterials();
-  }, [getMaterials]);
-
-  const handleAddMaterial = async (formData) => {
-    formData.append('subject', selectedSubject);
-    setIsProcessing(true);
-    toast.loading('Uploading Material...');
-    try {
-      await materialService.addMaterial(formData);
-      toast.dismiss();
-      toast.success('Material added successfully!');
-      setIsModalOpen(false);
-      getMaterials();
-    } catch (error) {
-      toast.dismiss();
-      toast.error(error.response?.data?.message || 'Failed to add material.');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const openDeleteConfirm = (material) => {
-    setSelectedMaterial(material);
-    setIsDeleteConfirmOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (!selectedMaterial) return;
-    setIsProcessing(true);
-    toast.loading('Deleting material...');
-    try {
-      await materialService.deleteMaterial(selectedMaterial._id);
-      toast.dismiss();
-      toast.success('Material deleted successfully!');
-      setIsDeleteConfirmOpen(false);
-      setSelectedMaterial(null);
-      getMaterials();
-    } catch (error) {
-      toast.dismiss();
-      toast.error(
-        error.response?.data?.message || 'Failed to delete material.'
-      );
-    } finally {
-      setIsProcessing(false);
-    }
+  const handleSubjectChange = (value) => {
+    const subjectValue = value === 'all' ? '' : value;
+    setSearchParams({ subject: subjectValue });
   };
 
   return (
     <div>
-      <div className="flex justify-between items-center">
-        <Heading title="Study Material" />
-        <CustomButton
-          onClick={() => setIsModalOpen(true)}
-          disabled={!selectedSubject}
-        >
-          Add Material
-        </CustomButton>
+      <div className="flex justify-between items-center mb-6">
+        <Heading title="Manage Study Materials" />
+        <CustomButton onClick={() => openModal()}>Upload Material</CustomButton>
       </div>
 
-      <div className="mt-6">
-        <label className="block text-sm font-medium">Select Subject</label>
-        <select
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
-          className="w-full md:w-1/3 px-4 py-2 border rounded-md"
-        >
-          <option value="">Select a Subject to View Materials</option>
-          {subjects.map((sub) => (
-            <option key={sub._id} value={sub._id}>
-              {sub.name}
-            </option>
-          ))}
-        </select>
+      <div className="mb-6 max-w-xs">
+        <Select onValueChange={handleSubjectChange} defaultValue="all">
+          <SelectTrigger>
+            <SelectValue placeholder="Filter by Subject" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Subjects</SelectItem>
+            {subjects.map((s) => (
+              <SelectItem key={s._id} value={s._id}>
+                {s.name} ({s.code})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {isLoading ? (
         <Loading />
-      ) : !selectedSubject ? null : materials.length === 0 ? (
+      ) : materials.length === 0 ? (
         <NoData />
       ) : (
-        <MaterialList materials={materials} onDelete={openDeleteConfirm} />
+        <MaterialTable
+          materials={materials}
+          onDelete={openDeleteConfirm}
+        />
       )}
 
       {isModalOpen && (
         <Modal
-          title="Add New Material"
+          title="Upload New Material"
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={closeModal}
         >
           <MaterialForm
-            onAdd={handleAddMaterial}
-            onCancel={() => setIsModalOpen(false)}
+            onUpsert={handleUpsert}
+            onCancel={closeModal}
             isProcessing={isProcessing}
+            subjects={subjects}
           />
         </Modal>
       )}
@@ -153,7 +108,7 @@ const Material = () => {
       {isDeleteConfirmOpen && (
         <DeleteConfirm
           isOpen={isDeleteConfirmOpen}
-          onClose={() => setIsDeleteConfirmOpen(false)}
+          onClose={closeDeleteConfirm}
           onConfirm={handleDelete}
         />
       )}

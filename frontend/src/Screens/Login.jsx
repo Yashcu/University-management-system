@@ -5,6 +5,10 @@ import { Toaster, toast } from 'react-hot-toast';
 import CustomButton from '../components/ui/CustomButton';
 import { authService } from '../services/authService';
 import { loginSuccess } from '../redux/authSlice';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -21,7 +25,7 @@ const Login = () => {
       return toast.error('Please fill all the fields');
     }
     setLoading(true);
-    toast.loading('Logging In');
+    toast.loading('Logging In...');
 
     try {
       const { data } = await authService.login({ email, password, userType });
@@ -43,85 +47,61 @@ const Login = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form
-        className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
-        onSubmit={loginHandler}
-      >
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-          Login
-        </h2>
-
-        <div className="mb-4">
-          <label
-            htmlFor="email"
-            className="block text-gray-700 text-sm font-medium mb-2"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your email"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label
-            htmlFor="password"
-            className="block text-gray-700 text-sm font-medium mb-2"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your password"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label
-            htmlFor="userType"
-            className="block text-gray-700 text-sm font-medium mb-2"
-          >
-            Login as
-          </label>
-          <select
-            id="userType"
-            value={userType}
-            onChange={(e) => setUserType(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="student">Student</option>
-            <option value="faculty">Faculty</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-
-        <CustomButton
-          type="submit"
-          className="w-full"
-          loading={loading}
-          disabled={loading}
-        >
-          Login
-        </CustomButton>
-
-        <div className="mt-4 text-center">
-          <Link
-            to="/forget-password"
-            className="text-sm text-blue-500 hover:underline"
-          >
-            Forgot Password?
-          </Link>
-        </div>
-      </form>
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardDescription>Enter your email below to login to your account.</CardDescription>
+        </CardHeader>
+        <form onSubmit={loginHandler}>
+          <CardContent className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="userType">Login as</Label>
+              <Select value={userType} onValueChange={setUserType}>
+                <SelectTrigger id="userType">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="faculty">Faculty</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col">
+            <CustomButton className="w-full" type="submit" loading={loading} disabled={loading}>
+              Sign in
+            </CustomButton>
+            <div className="mt-4 text-center text-sm">
+              <Link to="/forget-password"
+                className="underline">
+                Forgot your password?
+              </Link>
+            </div>
+          </CardFooter>
+        </form>
+      </Card>
       <Toaster position="bottom-center" />
     </div>
   );

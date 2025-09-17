@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -20,37 +21,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const subjectSchema = z.object({
-  name: z.string().min(1, 'Subject name is required'),
-  code: z.string().min(1, 'Subject code is required'),
-  branchId: z.string().min(1, 'Branch must be selected'),
-  semester: z.string().min(1, 'Semester is required'),
+const noticeSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  content: z.string().min(1, 'Content is required'),
+  target: z.string().min(1, 'Target audience is required'),
 });
 
-const SubjectForm = ({
+const NoticeForm = ({
   isEditing,
   selectedItem,
   onUpsert,
   onCancel,
   isProcessing,
-  branches,
 }) => {
   const form = useForm({
-    resolver: zodResolver(subjectSchema),
+    resolver: zodResolver(noticeSchema),
     defaultValues: {
-      name: selectedItem?.name || '',
-      code: selectedItem?.code || '',
-      branchId: selectedItem?.branchId?._id || '',
-      semester: selectedItem?.semester?.toString() || '',
+      title: selectedItem?.title || '',
+      content: selectedItem?.content || '',
+      target: selectedItem?.target || '',
     },
   });
 
   useEffect(() => {
     form.reset({
-      name: selectedItem?.name || '',
-      code: selectedItem?.code || '',
-      branchId: selectedItem?.branchId?._id || '',
-      semester: selectedItem?.semester?.toString() || '',
+      title: selectedItem?.title || '',
+      content: selectedItem?.content || '',
+      target: selectedItem?.target || '',
     });
   }, [isEditing, selectedItem, form]);
 
@@ -63,12 +60,12 @@ const SubjectForm = ({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="name"
+          name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Subject Name</FormLabel>
+              <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Data Structures" {...field} />
+                <Input placeholder="e.g., Holiday Announcement" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -76,12 +73,16 @@ const SubjectForm = ({
         />
         <FormField
           control={form.control}
-          name="code"
+          name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Subject Code</FormLabel>
+              <FormLabel>Content</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., CS201" {...field} />
+                <Textarea
+                  placeholder="Enter the notice details here."
+                  className="resize-none"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,37 +90,22 @@ const SubjectForm = ({
         />
         <FormField
           control={form.control}
-          name="branchId"
+          name="target"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Branch</FormLabel>
+              <FormLabel>Target Audience</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a branch" />
+                    <SelectValue placeholder="Select who this notice is for" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {branches.map((b) => (
-                    <SelectItem key={b._id} value={b._id}>
-                      {b.name}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="student">Students</SelectItem>
+                  <SelectItem value="faculty">Faculty</SelectItem>
                 </SelectContent>
               </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="semester"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Semester</FormLabel>
-              <FormControl>
-                <Input type="number" placeholder="e.g., 3" {...field} />
-              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -133,7 +119,7 @@ const SubjectForm = ({
             loading={isProcessing}
             disabled={isProcessing}
           >
-            {isEditing ? 'Update Subject' : 'Add Subject'}
+            {isEditing ? 'Update Notice' : 'Add Notice'}
           </CustomButton>
         </div>
       </form>
@@ -141,4 +127,4 @@ const SubjectForm = ({
   );
 };
 
-export default SubjectForm;
+export default NoticeForm;

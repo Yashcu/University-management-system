@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import CustomButton from '../components/ui/CustomButton';
 import { authService } from '../services/authService';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
@@ -35,69 +39,52 @@ const ForgetPassword = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form
-        className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
-        onSubmit={forgetPasswordHandler}
-      >
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-          Forgot Password
-        </h2>
-        <p className="text-center text-gray-600 mb-6">
-          Enter your email and select your role to receive a password reset
-          link.
-        </p>
-
-        <div className="mb-4">
-          <label
-            htmlFor="email"
-            className="block text-gray-700 text-sm font-medium mb-2"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your email"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label
-            htmlFor="userType"
-            className="block text-gray-700 text-sm font-medium mb-2"
-          >
-            I am a
-          </label>
-          <select
-            id="userType"
-            value={userType}
-            onChange={(e) => setUserType(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="student">Student</option>
-            <option value="faculty">Faculty</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-
-        <CustomButton
-          type="submit"
-          className="w-full"
-          loading={loading}
-          disabled={loading}
-        >
-          Send Reset Link
-        </CustomButton>
-
-        <div className="mt-4 text-center">
-          <Link to="/" className="text-sm text-blue-500 hover:underline">
-            Back to Login
-          </Link>
-        </div>
-      </form>
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-2xl">Forgot Password</CardTitle>
+          <CardDescription>
+            Enter your email and select your role to receive a password reset link.
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={forgetPasswordHandler}>
+          <CardContent className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="userType">I am a</Label>
+              <Select value={userType} onValueChange={setUserType}>
+                <SelectTrigger id="userType">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="faculty">Faculty</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col">
+            <CustomButton className="w-full" type="submit" loading={loading} disabled={loading}>
+              Send Reset Link
+            </CustomButton>
+            <div className="mt-4 text-center text-sm">
+              <Link to="/" className="underline">
+                Back to Login
+              </Link>
+            </div>
+          </CardFooter>
+        </form>
+      </Card>
       <Toaster position="bottom-center" />
     </div>
   );
