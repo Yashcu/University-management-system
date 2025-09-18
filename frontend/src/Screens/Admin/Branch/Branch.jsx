@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Heading from '../../../components/ui/Heading';
 import Loading from '../../../components/ui/Loading';
 import NoData from '../../../components/ui/NoData';
@@ -26,7 +26,12 @@ const Branch = () => {
     closeDeleteConfirm,
     handleUpsert,
     handleDelete,
-  } = useCrud(branchService, { fetchOnMount: true });
+  } = useCrud(branchService);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
 
   return (
     <div>

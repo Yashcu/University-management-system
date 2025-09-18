@@ -5,16 +5,17 @@ const login = (credentials) => {
 };
 
 const forgetPassword = (emailData) => {
-  return axiosWrapper.post('/forget-password', emailData);
+  return axiosWrapper.post(`/student/forget-password`, emailData);
 };
 
 const updatePassword = (token, type, passwordData) => {
-  return axiosWrapper.patch(`/${type}/update-password/${token}`, passwordData);
+  return axiosWrapper.post(`/${type}/update-password/${token}`, passwordData);
 };
 
 const updateLoggedInPassword = (passwordData) => {
   const userToken = localStorage.getItem('userToken');
-  return axiosWrapper.patch('/update-password', passwordData, {
+  const userType = localStorage.getItem('userType');
+  return axiosWrapper.post(`/${userType}/change-password`, passwordData, {
     headers: { Authorization: `Bearer ${userToken}` },
   });
 };

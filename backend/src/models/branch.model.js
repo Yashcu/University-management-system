@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Branch = new mongoose.Schema(
   {
-    branchId: {
+    code: {
       type: String,
       required: true,
       unique: true,

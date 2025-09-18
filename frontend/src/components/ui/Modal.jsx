@@ -4,20 +4,20 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose, // Import DialogClose for the 'x' button
-} from "@/components/ui/dialog";
-import { X } from 'lucide-react';
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 const Modal = React.memo(({ title, isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader className="p-6 pb-4">
           <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>Please fill out the form below.</DialogDescription>
         </DialogHeader>
-        {children}
+        <div className="p-6 pt-0 max-h-[70vh] overflow-y-auto">{children}</div>
       </DialogContent>
     </Dialog>
   );

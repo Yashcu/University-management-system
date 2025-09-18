@@ -103,4 +103,16 @@ studentDetailsSchema.pre('save', async function (next) {
 
 const studentDetails = mongoose.model('StudentDetail', studentDetailsSchema);
 
+studentDetailsSchema.virtual('profileUrl').get(function() {
+  if (this.profile) {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:4000';
+    return `${backendUrl}/media/${this.profile}`;
+  }
+  return null;
+});
+
+// Ensure virtuals are included when converting to JSON
+studentDetailsSchema.set('toJSON', { virtuals: true });
+studentDetailsSchema.set('toObject', { virtuals: true });
+
 module.exports = studentDetails;

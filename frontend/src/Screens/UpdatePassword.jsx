@@ -31,7 +31,7 @@ const UpdatePassword = () => {
       toast.dismiss();
       if (data.success) {
         toast.success(data.message);
-        navigate('/');
+        navigate('/login');
       }
     } catch (error) {
       toast.dismiss();

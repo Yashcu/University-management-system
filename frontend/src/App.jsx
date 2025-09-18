@@ -1,9 +1,13 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import mystore from './redux/store';
 import ProtectedRoute from './components/ProtectedRoute';
 import Loading from './components/ui/Loading';
+import { setupInterceptors } from './utils/AxiosWrapper';
+import "react-day-picker/dist/style.css";
+
+setupInterceptors(mystore);
 
 const Login = lazy(() => import('./Screens/Login'));
 const ForgetPassword = lazy(() => import('./Screens/ForgetPassword'));
@@ -19,7 +23,8 @@ const App = () => {
         <Suspense fallback={<Loading />}>
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/forget-password" element={<ForgetPassword />} />
             <Route
               path="/:type/update-password/:resetId"

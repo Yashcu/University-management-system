@@ -2,17 +2,20 @@ const Branch = require('../models/branch.model');
 const ApiError = require('../utils/ApiError');
 
 async function getAllBranches(search = '') {
-  return Branch.find({
-    $or: [
-      { name: { $regex: search, $options: 'i' } },
-      { branchId: { $regex: search, $options: 'i' } },
-    ],
-  });
+  const query = search
+    ? {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { code: { $regex: search, $options: 'i' } },
+        ],
+      }
+    : {};
+  return Branch.find(query);
 }
 
 async function addBranch(data) {
-  const { name, branchId } = data;
-  const existing = await Branch.findOne({ $or: [{ name }, { branchId }] });
+  const { name, code } = data;
+  const existing = await Branch.findOne({ $or: [{ name }, { code }] });
   if (existing) {
     throw new ApiError(409, 'Branch with this name or ID already exists!');
   }
@@ -20,11 +23,11 @@ async function addBranch(data) {
 }
 
 async function updateBranch(id, data) {
-  const { name, branchId } = data;
-  if (name || branchId) {
+  const { name, code } = data;
+  if (name || code) {
     const existing = await Branch.findOne({
       _id: { $ne: id },
-      $or: [name ? { name } : {}, branchId ? { branchId } : {}],
+      $or: [name ? { name } : {}, code ? { code } : {}],
     });
     if (existing) {
       throw new ApiError(409, 'Branch with this name or ID already exists!');

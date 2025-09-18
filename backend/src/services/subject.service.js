@@ -7,8 +7,8 @@ const getSubjects = async (queryParams) => {
   if (branch) query.branch = branch;
   if (semester) query.semester = semester;
   const subjects = await Subject.find(query).populate('branch');
-  if (!subjects || subjects.length === 0) {
-    throw new ApiError(404, 'No Subjects Found');
+  if (!subjects) {
+    return [];
   }
   return subjects;
 };

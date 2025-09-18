@@ -5,7 +5,13 @@ const config = {
   mongodbUri: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
   frontendApiLink: process.env.FRONTEND_API_LINK,
+  backendUrl: process.env.BACKEND_URL || 'http://localhost:4000',
 
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
+  },
   nodemailer: {
     email: process.env.NODEMAILER_EMAIL,
     pass: process.env.NODEMAILER_PASS,

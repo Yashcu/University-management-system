@@ -20,7 +20,7 @@ const {
 router.get('/', auth, getBranchController);
 
 router.post(
-  '/',
+  '/register',
   auth,
   authorize([USER_ROLES.ADMIN]),
   validate(addBranchSchema),

@@ -29,8 +29,8 @@ const loginFaculty = async (loginData) => {
 
 const getAllFaculty = async () => {
   const users = await facultyDetails.find().select('-__v -password');
-  if (!users || users.length === 0) {
-    throw new ApiError(404, 'No Faculty Found');
+  if (!users) {
+    return [];
   }
   return users;
 };

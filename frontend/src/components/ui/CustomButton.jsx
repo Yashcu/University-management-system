@@ -11,6 +11,7 @@ const CustomButton = React.memo(
     className = '',
     variant = 'default',
     loading = false,
+    ...props
   }) => {
     return (
       <Button
@@ -19,6 +20,7 @@ const CustomButton = React.memo(
         disabled={disabled || loading}
         className={className}
         variant={variant}
+        {...props}
       >
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {children}

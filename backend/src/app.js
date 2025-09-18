@@ -17,14 +17,15 @@ const limiter = rateLimit({
 
 app.use(limiter);
 app.use(helmet());
-app.use(cors({ origin: config.frontendApiLink }));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- STATIC ASSETS ---
-app.use('/media', express.static(path.join(__dirname, '../media')));
+app.use(cors({
+  origin: config.frontendApiLink,
+  credentials: true,
+}));
 
-// --- API ROUTES ---
 app.get('/', (req, res) => {
   res.send('Hello 👋 I am Working Fine 🚀');
 });

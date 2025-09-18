@@ -25,7 +25,7 @@ const Home = () => {
 
   const logoutHandler = () => {
     dispatch(logout());
-    navigate('/');
+    navigate('/login');
   };
 
   const renderContent = () => {

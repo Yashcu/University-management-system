@@ -11,7 +11,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CustomButton from '../../../components/ui/CustomButton';
 
 const FacultyTable = ({ faculties, onEdit, onDelete }) => {
-  const mediaUrl = import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
 
   return (
     <div className="rounded-md border">
@@ -30,7 +29,7 @@ const FacultyTable = ({ faculties, onEdit, onDelete }) => {
             <TableRow key={faculty._id}>
               <TableCell>
                 <Avatar>
-                  <AvatarImage src={faculty.profile ? `${mediaUrl}/media/${faculty.profile}` : '/assets/avatar.png'} alt={`${faculty.firstName} ${faculty.lastName}`} />
+                  <AvatarImage src={faculty.profile} alt={`${faculty.firstName} ${faculty.lastName}`} />
                   <AvatarFallback>{faculty.firstName?.[0]}{faculty.lastName?.[0]}</AvatarFallback>
                 </Avatar>
               </TableCell>

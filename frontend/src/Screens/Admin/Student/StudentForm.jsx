@@ -20,14 +20,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-
+// Updated Zod schema to match the backend model
 const studentSchema = z.object({
-  studentId: z.string().min(1, 'Student ID is required'),
-  name: z.string().min(1, 'Full name is required'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-  branch: z.string().min(1, 'Branch must be selected'),
-  profilePic: z.any().optional(),
+  firstName: z.string().min(1, 'First name is required'),
+  middleName: z.string().optional(),
+  lastName: z.string().min(1, 'Last name is required'),
+  phone: z.string().regex(/^\d{10}$/, 'Phone number must be 10 digits'),
+  semester: z.coerce.number().int().min(1).max(8),
+  branchId: z.string().min(1, 'Branch must be selected'),
+  gender: z.enum(['male', 'female', 'other']),
+  dob: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: 'Invalid date of birth format',
+  }),
+  address: z.string().min(1, 'Address is required'),
+  city: z.string().min(1, 'City is required'),
+  state: z.string().min(1, 'State is required'),
+  pincode: z.string().regex(/^\d{6}$/, 'Pincode must be 6 digits'),
+  country: z.string().min(1, 'Country is required'),
+  profile: z.any().optional(),
 });
 
 const StudentForm = ({
@@ -41,42 +51,41 @@ const StudentForm = ({
   const form = useForm({
     resolver: zodResolver(studentSchema),
     defaultValues: {
-      studentId: selectedItem?.studentId || '',
-      name: selectedItem?.name || '',
-      email: selectedItem?.email || '',
-      phone: selectedItem?.phone || '',
-      branch: selectedItem?.branch?._id || '',
-      profilePic: null,
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      phone: '',
+      semester: '',
+      branchId: '',
+      gender: '',
+      dob: '',
+      address: '',
+      city: '',
+      state: '',
+      pincode: '',
+      country: '',
+      profile: null,
     },
   });
 
   useEffect(() => {
     if (isEditing && selectedItem) {
       form.reset({
-        studentId: selectedItem.studentId || '',
-        name: selectedItem.name || '',
-        email: selectedItem.email || '',
-        phone: selectedItem.phone || '',
-        branch: selectedItem.branch?._id || '',
+        ...selectedItem,
+        branchId: selectedItem.branchId?._id || '',
+        dob: selectedItem.dob ? new Date(selectedItem.dob).toISOString().split('T')[0] : '',
       });
     } else {
-      form.reset({
-        studentId: '',
-        name: '',
-        email: '',
-        phone: '',
-        branch: '',
-        profilePic: null,
-      });
+      form.reset();
     }
   }, [isEditing, selectedItem, form]);
 
   const onSubmit = (data) => {
     const formData = new FormData();
     Object.keys(data).forEach((key) => {
-      if (key === 'profilePic') {
-        if (data.profilePic && data.profilePic.length > 0) {
-          formData.append(key, data.profilePic[0]);
+      if (key === 'profile') {
+        if (data.profile && data.profile.length > 0) {
+          formData.append('file', data.profile[0]);
         }
       } else {
         formData.append(key, data[key]);
@@ -87,15 +96,16 @@ const StudentForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Add all the new form fields here */}
         <FormField
           control={form.control}
-          name="studentId"
+          name="firstName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Student ID</FormLabel>
+              <FormLabel>First Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter student ID" {...field} disabled={isEditing} />
+                <Input placeholder="Enter first name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -103,25 +113,12 @@ const StudentForm = ({
         />
         <FormField
           control={form.control}
-          name="name"
+          name="lastName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Full Name</FormLabel>
+              <FormLabel>Last Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter full name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="m@example.com" {...field} />
+                <Input placeholder="Enter last name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -142,7 +139,20 @@ const StudentForm = ({
         />
         <FormField
           control={form.control}
-          name="branch"
+          name="semester"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Semester</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="Enter semester" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="branchId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Branch</FormLabel>
@@ -166,9 +176,109 @@ const StudentForm = ({
         />
         <FormField
           control={form.control}
-          name="profilePic"
+          name="gender"
           render={({ field }) => (
             <FormItem>
+              <FormLabel>Gender</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="dob"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Date of Birth</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem className="md:col-span-2">
+              <FormLabel>Address</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter address" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="city"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>City</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter city" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="state"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>State</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter state" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="pincode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Pincode</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter pincode" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="country"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Country</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter country" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="profile"
+          render={({ field }) => (
+            <FormItem className="md:col-span-2">
               <FormLabel>Profile Picture</FormLabel>
               <FormControl>
                 <Input
@@ -180,7 +290,7 @@ const StudentForm = ({
             </FormItem>
           )}
         />
-        <div className="flex justify-end gap-4 pt-4 border-t mt-6">
+        <div className="md:col-span-2 flex justify-end gap-4 pt-4 border-t mt-6">
           <CustomButton type="button" variant="outline" onClick={onCancel}>
             Cancel
           </CustomButton>

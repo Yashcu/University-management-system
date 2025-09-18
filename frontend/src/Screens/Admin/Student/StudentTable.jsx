@@ -8,11 +8,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import CustomButton from '../../../components/ui/CustomButton'; // Your custom button
+import CustomButton from '../../../components/ui/CustomButton';
 
 const StudentTable = ({ students, onEdit, onDelete }) => {
-  const mediaUrl = import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
-
   return (
     <div className="rounded-md border">
       <Table>
@@ -31,7 +29,7 @@ const StudentTable = ({ students, onEdit, onDelete }) => {
             <TableRow key={student._id}>
               <TableCell>
                 <Avatar>
-                  <AvatarImage src={student.profile ? `${mediaUrl}/media/${student.profile}` : '/assets/avatar.png'} alt={`${student.firstName} ${student.lastName}`} />
+                  <AvatarImage src={student.profile || '/assets/avatar.png'} alt={`${student.firstName} ${student.lastName}`} />
                   <AvatarFallback>{student.firstName?.[0]}{student.lastName?.[0]}</AvatarFallback>
                 </Avatar>
               </TableCell>

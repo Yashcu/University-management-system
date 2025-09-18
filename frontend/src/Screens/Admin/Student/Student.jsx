@@ -48,8 +48,15 @@ const Student = () => {
     }
   }, []);
 
+  const executeSearch = useCallback(() => {
+    const activeSearchParams = Object.fromEntries(
+      Object.entries(searchParams).filter(([, value]) => value)
+    );
+    fetchData(activeSearchParams);
+  }, [fetchData, searchParams]);
+
   useEffect(() => {
-    fetchData(searchParams);
+    executeSearch();
   }, [fetchData, searchParams]);
 
   useEffect(() => {
@@ -58,11 +65,11 @@ const Student = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchData(searchParams);
+    executeSearch();
   };
 
-  const handleValueChange = (value) => {
-    setSearchParams({ ...searchParams, branch: value });
+  const handleBranchChange = (value) => {
+    setSearchParams({ ...searchParams, branch: value === 'all' ? '' : value });
   };
 
 
@@ -93,12 +100,12 @@ const Student = () => {
             setSearchParams({ ...searchParams, name: e.target.value })
           }
         />
-        <Select onValueChange={handleValueChange}>
+        <Select onValueChange={handleBranchChange} value={searchParams.branch || 'all'}>
           <SelectTrigger>
             <SelectValue placeholder="All Branches" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value=" ">All Branches</SelectItem>
+            <SelectItem value="all">All Branches</SelectItem>
             {branches.map((b) => (
               <SelectItem key={b._id} value={b._id}>
                 {b.name}

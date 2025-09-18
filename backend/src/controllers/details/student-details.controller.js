@@ -1,5 +1,15 @@
 const studentDetailsService = require('../../services/student-details.service');
 const ApiResponse = require('../../utils/ApiResponse');
+const config = require('../../config');
+
+const addProfileUrl = (user) => {
+  if (user && user.profile) {
+    const userObj = user.toObject ? user.toObject() : user;
+    userObj.profileUrl = `${config.backendUrl}/media/${user.profile}`;
+    return userObj;
+  }
+  return user;
+};
 
 const loginStudentController = async (req, res, next) => {
   try {

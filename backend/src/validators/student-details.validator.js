@@ -116,9 +116,6 @@ const searchStudentsSchema = z.object({
         .regex(objectIdRegex, 'Invalid Branch ID format')
         .optional(),
     })
-    .refine((data) => Object.keys(data).length > 0, {
-      message: 'Select at least one filter',
-    }),
 });
 
 const deleteStudentSchema = z.object({

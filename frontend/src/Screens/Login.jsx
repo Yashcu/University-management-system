@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
-import CustomButton from '../components/ui/CustomButton';
-import { authService } from '../services/authService';
-import { loginSuccess } from '../redux/authSlice';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { authService } from '../services/authService';
+import { loginSuccess } from '../redux/authSlice';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -90,9 +90,9 @@ const Login = () => {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col">
-            <CustomButton className="w-full" type="submit" loading={loading} disabled={loading}>
+            <Button className="w-full" type="submit" loading={loading} disabled={loading}>
               Sign in
-            </CustomButton>
+            </Button>
             <div className="mt-4 text-center text-sm">
               <Link to="/forget-password"
                 className="underline">
