@@ -8,7 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 const DeleteConfirm = React.memo(({ isOpen, onClose, onConfirm, message }) => {
   if (!isOpen) return null;
@@ -19,7 +19,8 @@ const DeleteConfirm = React.memo(({ isOpen, onClose, onConfirm, message }) => {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            {message || 'This action cannot be undone. This will permanently delete the item.'}
+            {message ||
+              'This action cannot be undone. This will permanently delete the item.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

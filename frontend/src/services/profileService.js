@@ -1,23 +1,17 @@
-import axiosWrapper from '../utils/AxiosWrapper';
+import axiosWrapper from '../lib/AxiosWrapper';
+import { getAuthHeaders } from '../lib/apiHelpers';
 
-const getProfile = () => {
-  const userToken = localStorage.getItem('userToken');
-  return axiosWrapper.get('/profile', {
-    headers: { Authorization: `Bearer ${userToken}` },
+const getMyProfile = () => {
+  const userType = localStorage.getItem('userType');
+  return axiosWrapper.get(`/${userType}/my-details`, { headers: getAuthHeaders() });
+};
+const updateMyProfile = (id, data) => {
+  const userType = localStorage.getItem('userType');
+  return axiosWrapper.patch(`/${userType}/${id}`, data, {
+    headers: getAuthHeaders(data instanceof FormData),
   });
 };
-
-const updateProfile = (formData) => {
-  const userToken = localStorage.getItem('userToken');
-  return axiosWrapper.patch('/profile', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-      Authorization: `Bearer ${userToken}`,
-    },
-  });
-};
-
 export const profileService = {
-  getProfile,
-  updateProfile,
+  getMyProfile,
+  updateMyProfile,
 };

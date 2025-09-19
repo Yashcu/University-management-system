@@ -1,15 +1,18 @@
-import axiosWrapper from '../utils/AxiosWrapper';
+import axiosWrapper from '../lib/AxiosWrapper';
 
 const login = (credentials) => {
   return axiosWrapper.post(`/${credentials.userType}/login`, credentials);
 };
 
 const forgetPassword = (emailData) => {
-  return axiosWrapper.post(`/student/forget-password`, emailData);
+  const userType = emailData.userType || 'student';
+  return axiosWrapper.post(`/${userType}/forget-password`, emailData);
 };
 
 const updatePassword = (token, type, passwordData) => {
-  return axiosWrapper.post(`/${type}/update-password/${token}`, passwordData);
+  return axiosWrapper.post(`/${type}/update-password/${token}`, {
+    password: passwordData.newPassword,
+  });
 };
 
 const updateLoggedInPassword = (passwordData) => {

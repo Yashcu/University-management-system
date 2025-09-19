@@ -1,28 +1,15 @@
-import axiosWrapper from '../utils/AxiosWrapper';
+import axiosWrapper from '../lib/AxiosWrapper';
+import { getAuthHeaders } from '../lib/apiHelpers';
 
-const getMarksByExamAndSubject = (examId, subjectId) => {
-  const userToken = localStorage.getItem('userToken');
-  return axiosWrapper.get(`/marks/exam/${examId}/subject/${subjectId}`, {
-    headers: { Authorization: `Bearer ${userToken}` },
-  });
-};
-
-const addOrUpdateMarks = (marksData) => {
-  const userToken = localStorage.getItem('userToken');
-  return axiosWrapper.post('/marks', marksData, {
-    headers: { Authorization: `Bearer ${userToken}` },
-  });
-};
-
-const getStudentMarks = () => {
-  const userToken = localStorage.getItem('userToken');
-  return axiosWrapper.get('/marks/student', {
-    headers: { Authorization: `Bearer ${userToken}` },
-  });
-};
+const getStudentsForMarksEntry = (params) =>
+  axiosWrapper.get('/marks/students', { headers: getAuthHeaders(), params });
+const addBulkMarks = (marksData) =>
+  axiosWrapper.post('/marks/bulk', marksData, { headers: getAuthHeaders() });
+const getStudentMarks = (params) =>
+  axiosWrapper.get('/marks/student', { headers: getAuthHeaders(), params });
 
 export const marksService = {
-  getMarksByExamAndSubject,
-  addOrUpdateMarks,
+  getStudentsForMarksEntry,
+  addBulkMarks,
   getStudentMarks,
 };

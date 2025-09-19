@@ -1,63 +1,32 @@
-import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import mystore from './redux/store';
-import ProtectedRoute from './components/ProtectedRoute';
-import Loading from './components/ui/Loading';
-import { setupInterceptors } from './utils/AxiosWrapper';
-import "react-day-picker/dist/style.css";
+import { setupInterceptors } from './lib/AxiosWrapper';
+import 'react-day-picker/dist/style.css';
+
+import AuthRoutes from './features/auth/routes';
+import AdminRoutes from './features/admin/routes';
+import FacultyRoutes from './features/faculty/routes';
+import StudentRoutes from './features/student/routes';
 
 setupInterceptors(mystore);
-
-const Login = lazy(() => import('./Screens/Login'));
-const ForgetPassword = lazy(() => import('./Screens/ForgetPassword'));
-const UpdatePassword = lazy(() => import('./Screens/UpdatePassword'));
-const StudentHome = lazy(() => import('./Screens/Student/Home'));
-const FacultyHome = lazy(() => import('./Screens/Faculty/Home'));
-const AdminHome = lazy(() => import('./Screens/Admin/Home'));
 
 const App = () => {
   return (
     <Provider store={mystore}>
       <Router>
-        <Suspense fallback={<Loading />}>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Navigate to="/login" />} />
-            <Route path="/forget-password" element={<ForgetPassword />} />
-            <Route
-              path="/:type/update-password/:resetId"
-              element={<UpdatePassword />}
-            />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/*" element={<AuthRoutes />} />
 
-            {/* Protected Routes */}
-            <Route
-              path="/student"
-              element={
-                <ProtectedRoute>
-                  <StudentHome />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/faculty"
-              element={
-                <ProtectedRoute>
-                  <FacultyHome />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <AdminHome />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Suspense>
+          {/* Protected Routes */}
+          <Route path="/student/*" element={<StudentRoutes />} />
+          <Route path="/faculty/*" element={<FacultyRoutes />} />
+          <Route path="/admin/*" element={<AdminRoutes />} />
+
+          {/* Fallback for unmatched routes */}
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
       </Router>
     </Provider>
   );

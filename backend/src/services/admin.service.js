@@ -96,6 +96,17 @@ const updateDetails = async (adminId, adminData, file) => {
     adminData.profile = file.filename;
   }
 
+  if (adminData['emergencyContact[name]']) {
+    adminData.emergencyContact = {
+      name: adminData['emergencyContact[name]'],
+      relationship: adminData['emergencyContact[relationship]'],
+      phone: adminData['emergencyContact[phone]'],
+    };
+    delete adminData['emergencyContact[name]'];
+    delete adminData['emergencyContact[relationship]'];
+    delete adminData['emergencyContact[phone]'];
+  }
+
   if (adminData.dob) {
     adminData.dob = new Date(adminData.dob);
   }
