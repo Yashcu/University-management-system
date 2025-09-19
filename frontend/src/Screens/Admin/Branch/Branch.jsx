@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import Heading from '../../../components/ui/Heading';
 import Loading from '../../../components/ui/Loading';
 import NoData from '../../../components/ui/NoData';
@@ -31,7 +31,6 @@ const Branch = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
 
   return (
     <div>

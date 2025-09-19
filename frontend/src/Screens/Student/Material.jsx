@@ -12,8 +12,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Download } from 'lucide-react';
 
 const Material = () => {
@@ -21,7 +27,8 @@ const Material = () => {
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
-  const mediaUrl = import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
+  const mediaUrl =
+    import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
 
   const getSubjects = useCallback(async () => {
     try {
@@ -36,7 +43,9 @@ const Material = () => {
   const getMaterials = useCallback(async () => {
     setIsLoading(true);
     try {
-      const params = { subject: selectedSubject === 'all' ? '' : selectedSubject };
+      const params = {
+        subject: selectedSubject === 'all' ? '' : selectedSubject,
+      };
       const { data } = await materialService.search(params);
       setMaterials(data?.data || []);
     } catch (error) {
@@ -89,7 +98,9 @@ const Material = () => {
             <TableBody>
               {materials.map((material) => (
                 <TableRow key={material._id}>
-                  <TableCell className="font-medium">{material.title}</TableCell>
+                  <TableCell className="font-medium">
+                    {material.title}
+                  </TableCell>
                   <TableCell>{material.subjectId?.name || 'N/A'}</TableCell>
                   <TableCell className="text-right">
                     <a

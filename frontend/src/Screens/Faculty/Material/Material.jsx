@@ -11,7 +11,13 @@ import { useCrud } from '../../../hooks/useCrud';
 import MaterialForm from './MaterialForm';
 import MaterialTable from './MaterialTable';
 import toast from 'react-hot-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const Material = () => {
   const [subjects, setSubjects] = useState([]);
@@ -84,10 +90,7 @@ const Material = () => {
       ) : materials.length === 0 ? (
         <NoData />
       ) : (
-        <MaterialTable
-          materials={materials}
-          onDelete={openDeleteConfirm}
-        />
+        <MaterialTable materials={materials} onDelete={openDeleteConfirm} />
       )}
 
       {isModalOpen && (

@@ -10,7 +10,9 @@ import { fetchUserProfile } from '../../redux/authSlice';
 
 const UserProfile = () => {
   const dispatch = useDispatch();
-  const { user: profile, loading: isLoading } = useSelector((state) => state.auth);
+  const { user: profile, loading: isLoading } = useSelector(
+    (state) => state.auth
+  );
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -56,8 +58,8 @@ const UserProfile = () => {
     toast.loading('Updating Profile...');
 
     const formPayload = new FormData();
-    Object.keys(formData).forEach(key => {
-        formPayload.append(key, formData[key]);
+    Object.keys(formData).forEach((key) => {
+      formPayload.append(key, formData[key]);
     });
     if (profilePic) {
       formPayload.append('file', profilePic);
@@ -130,38 +132,78 @@ const UserProfile = () => {
                   className="w-24 h-24 rounded-full object-cover"
                 />
                 <div>
-                  <label htmlFor="profile-pic-upload" className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm">
+                  <label
+                    htmlFor="profile-pic-upload"
+                    className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm"
+                  >
                     Change Photo
                   </label>
-                  <input id="profile-pic-upload" type="file" className="hidden" onChange={handleFileChange} />
+                  <input
+                    id="profile-pic-upload"
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
                 </div>
               </div>
 
               {/* Form Fields using the single formData state */}
               <div>
                 <label>First Name</label>
-                <input id="firstName" type="text" value={formData.firstName} onChange={handleInputChange} className="w-full px-4 py-2 border rounded-md" />
+                <input
+                  id="firstName"
+                  type="text"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border rounded-md"
+                />
               </div>
               <div>
                 <label>Last Name</label>
-                <input id="lastName" type="text" value={formData.lastName} onChange={handleInputChange} className="w-full px-4 py-2 border rounded-md" />
+                <input
+                  id="lastName"
+                  type="text"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border rounded-md"
+                />
               </div>
               <div>
                 <label>Email</label>
-                <input id="email" type="email" value={formData.email} onChange={handleInputChange} className="w-full px-4 py-2 border rounded-md" />
+                <input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border rounded-md"
+                />
               </div>
               <div>
                 <label>Phone</label>
-                <input id="phone" type="text" value={formData.phone} onChange={handleInputChange} className="w-full px-4 py-2 border rounded-md" />
+                <input
+                  id="phone"
+                  type="text"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border rounded-md"
+                />
               </div>
 
               {renderExtraFields()}
 
               <div className="flex justify-between items-center pt-4 border-t">
-                <CustomButton type="submit" loading={isProcessing} disabled={isProcessing}>
+                <CustomButton
+                  type="submit"
+                  loading={isProcessing}
+                  disabled={isProcessing}
+                >
                   Update Profile
                 </CustomButton>
-                <CustomButton type="button" variant="secondary" onClick={() => setIsPasswordModalOpen(true)}>
+                <CustomButton
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setIsPasswordModalOpen(true)}
+                >
                   Change Password
                 </CustomButton>
               </div>

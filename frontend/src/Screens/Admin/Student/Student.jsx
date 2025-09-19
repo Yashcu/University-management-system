@@ -12,7 +12,13 @@ import StudentForm from './StudentForm';
 import StudentTable from './StudentTable';
 import toast from 'react-hot-toast';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const Student = () => {
   const [branches, setBranches] = useState([]);
@@ -72,7 +78,6 @@ const Student = () => {
     setSearchParams({ ...searchParams, branch: value === 'all' ? '' : value });
   };
 
-
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -100,7 +105,10 @@ const Student = () => {
             setSearchParams({ ...searchParams, name: e.target.value })
           }
         />
-        <Select onValueChange={handleBranchChange} value={searchParams.branch || 'all'}>
+        <Select
+          onValueChange={handleBranchChange}
+          value={searchParams.branch || 'all'}
+        >
           <SelectTrigger>
             <SelectValue placeholder="All Branches" />
           </SelectTrigger>

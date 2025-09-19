@@ -6,15 +6,15 @@ import CustomButton from '../../components/ui/CustomButton';
 import { useMarks } from '../../hooks/useMarks';
 import MarksTable from './MarksTable';
 import toast from 'react-hot-toast';
-import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import { examService } from '../../services/examService';
 
 const AddMarks = () => {
@@ -74,7 +74,9 @@ const AddMarks = () => {
               <Label>Subject</Label>
               <Select
                 value={filters.subjectId}
-                onValueChange={(value) => handleFilterChange('subjectId', value)}
+                onValueChange={(value) =>
+                  handleFilterChange('subjectId', value)
+                }
                 disabled={!filters.examId}
               >
                 <SelectTrigger>
@@ -86,7 +88,10 @@ const AddMarks = () => {
               </Select>
             </div>
 
-            <CustomButton onClick={handleGetStudents} disabled={!filters.examId || !filters.subjectId || loading}>
+            <CustomButton
+              onClick={handleGetStudents}
+              disabled={!filters.examId || !filters.subjectId || loading}
+            >
               {loading ? 'Fetching...' : 'Get Students'}
             </CustomButton>
           </div>
@@ -103,7 +108,11 @@ const AddMarks = () => {
             handleMarksChange={handleMarksChange}
           />
           <div className="flex justify-end mt-6">
-            <CustomButton onClick={handleSubmitMarks} loading={processing} disabled={processing}>
+            <CustomButton
+              onClick={handleSubmitMarks}
+              loading={processing}
+              disabled={processing}
+            >
               Submit Marks
             </CustomButton>
           </div>

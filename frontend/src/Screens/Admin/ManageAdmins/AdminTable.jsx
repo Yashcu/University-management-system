@@ -11,12 +11,8 @@ const AdminTable = ({ admins, onEdit, onDelete }) => {
             <th className="py-4 px-6 text-left font-semibold">Name</th>
             <th className="py-4 px-6 text-left font-semibold">Email</th>
             <th className="py-4 px-6 text-left font-semibold">Phone</th>
-            <th className="py-4 px-6 text-left font-semibold">
-              Employee ID
-            </th>
-            <th className="py-4 px-6 text-left font-semibold">
-              Designation
-            </th>
+            <th className="py-4 px-6 text-left font-semibold">Employee ID</th>
+            <th className="py-4 px-6 text-left font-semibold">Designation</th>
             <th className="py-4 px-6 text-center font-semibold">Actions</th>
           </tr>
         </thead>
@@ -36,10 +32,7 @@ const AdminTable = ({ admins, onEdit, onDelete }) => {
                   >
                     <MdEdit />
                   </CustomButton>
-                  <CustomButton
-                    variant="danger"
-                    onClick={() => onDelete(item)}
-                  >
+                  <CustomButton variant="danger" onClick={() => onDelete(item)}>
                     <MdOutlineDelete />
                   </CustomButton>
                 </td>

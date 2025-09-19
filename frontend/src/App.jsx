@@ -1,11 +1,16 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
 import { Provider } from 'react-redux';
 import mystore from './redux/store';
 import ProtectedRoute from './components/ProtectedRoute';
 import Loading from './components/ui/Loading';
 import { setupInterceptors } from './utils/AxiosWrapper';
-import "react-day-picker/dist/style.css";
+import 'react-day-picker/dist/style.css';
 
 setupInterceptors(mystore);
 

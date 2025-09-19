@@ -102,11 +102,7 @@ const UpdatePasswordLoggedIn = ({ isOpen, onClose }) => {
           <CustomButton type="button" variant="secondary" onClick={onClose}>
             Cancel
           </CustomButton>
-          <CustomButton
-            type="submit"
-            loading={isLoading}
-            disabled={isLoading}
-          >
+          <CustomButton type="submit" loading={isLoading} disabled={isLoading}>
             Update Password
           </CustomButton>
         </div>

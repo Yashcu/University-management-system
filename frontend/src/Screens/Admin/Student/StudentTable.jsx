@@ -6,8 +6,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from '@/components/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import CustomButton from '../../../components/ui/CustomButton';
 
 const StudentTable = ({ students, onEdit, onDelete }) => {
@@ -29,8 +29,14 @@ const StudentTable = ({ students, onEdit, onDelete }) => {
             <TableRow key={student._id}>
               <TableCell>
                 <Avatar>
-                  <AvatarImage src={student.profile || '/assets/avatar.png'} alt={`${student.firstName} ${student.lastName}`} />
-                  <AvatarFallback>{student.firstName?.[0]}{student.lastName?.[0]}</AvatarFallback>
+                  <AvatarImage
+                    src={student.profile || '/assets/avatar.png'}
+                    alt={`${student.firstName} ${student.lastName}`}
+                  />
+                  <AvatarFallback>
+                    {student.firstName?.[0]}
+                    {student.lastName?.[0]}
+                  </AvatarFallback>
                 </Avatar>
               </TableCell>
               <TableCell>{student.enrollmentNo}</TableCell>

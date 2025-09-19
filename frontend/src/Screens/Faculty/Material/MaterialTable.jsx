@@ -6,12 +6,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import CustomButton from '../../../components/ui/CustomButton';
 import { Download } from 'lucide-react';
 
 const MaterialTable = ({ materials, onDelete }) => {
-  const mediaUrl = import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
+  const mediaUrl =
+    import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
 
   return (
     <div className="rounded-md border">

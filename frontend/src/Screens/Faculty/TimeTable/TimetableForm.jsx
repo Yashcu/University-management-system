@@ -10,23 +10,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 const timetableSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   branchId: z.string().min(1, 'Branch must be selected'),
   semester: z.string().min(1, 'Semester is required'),
-  file: z
-    .any()
-    .refine((files) => files?.length == 1, "File is required.")
+  file: z.any().refine((files) => files?.length == 1, 'File is required.'),
 });
 
 const TimetableForm = ({ onUpsert, onCancel, isProcessing, branches }) => {

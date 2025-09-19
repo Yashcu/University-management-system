@@ -10,15 +10,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 // Updated Zod schema to match the backend model
 const studentSchema = z.object({
@@ -73,7 +73,9 @@ const StudentForm = ({
       form.reset({
         ...selectedItem,
         branchId: selectedItem.branchId?._id || '',
-        dob: selectedItem.dob ? new Date(selectedItem.dob).toISOString().split('T')[0] : '',
+        dob: selectedItem.dob
+          ? new Date(selectedItem.dob).toISOString().split('T')[0]
+          : '',
       });
     } else {
       form.reset();
@@ -96,7 +98,10 @@ const StudentForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+      >
         {/* Add all the new form fields here */}
         <FormField
           control={form.control}

@@ -11,13 +11,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import { Download } from 'lucide-react';
 
 const Timetable = () => {
   const [timetables, setTimetables] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const mediaUrl = import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
+  const mediaUrl =
+    import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
 
   const getTimetables = useCallback(async () => {
     setIsLoading(true);
@@ -55,7 +56,9 @@ const Timetable = () => {
               <TableBody>
                 {timetables.map((timetable) => (
                   <TableRow key={timetable._id}>
-                    <TableCell className="font-medium">{timetable.title}</TableCell>
+                    <TableCell className="font-medium">
+                      {timetable.title}
+                    </TableCell>
                     <TableCell>{timetable.semester}</TableCell>
                     <TableCell className="text-right">
                       <a

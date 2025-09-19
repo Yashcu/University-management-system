@@ -11,7 +11,7 @@ export const useMarks = () => {
     try {
       const { data } = await marksService.getStudentMarks();
       setMarks(data?.data || []);
-    } catch (error){
+    } catch (error) {
       toast.error('Failed to fetch marks');
     } finally {
       setIsLoading(false);

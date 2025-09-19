@@ -3,10 +3,23 @@ import { Link } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import CustomButton from '../components/ui/CustomButton';
 import { authService } from '../services/authService';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
@@ -43,7 +56,8 @@ const ForgetPassword = () => {
         <CardHeader>
           <CardTitle className="text-2xl">Forgot Password</CardTitle>
           <CardDescription>
-            Enter your email and select your role to receive a password reset link.
+            Enter your email and select your role to receive a password reset
+            link.
           </CardDescription>
         </CardHeader>
         <form onSubmit={forgetPasswordHandler}>
@@ -74,7 +88,12 @@ const ForgetPassword = () => {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col">
-            <CustomButton className="w-full" type="submit" loading={loading} disabled={loading}>
+            <CustomButton
+              className="w-full"
+              type="submit"
+              loading={loading}
+              disabled={loading}
+            >
               Send Reset Link
             </CustomButton>
             <div className="mt-4 text-center text-sm">

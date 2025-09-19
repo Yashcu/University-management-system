@@ -6,12 +6,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from '@/components/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import CustomButton from '../../../components/ui/CustomButton';
 
 const FacultyTable = ({ faculties, onEdit, onDelete }) => {
-
   return (
     <div className="rounded-md border">
       <Table>
@@ -29,8 +28,14 @@ const FacultyTable = ({ faculties, onEdit, onDelete }) => {
             <TableRow key={faculty._id}>
               <TableCell>
                 <Avatar>
-                  <AvatarImage src={faculty.profile} alt={`${faculty.firstName} ${faculty.lastName}`} />
-                  <AvatarFallback>{faculty.firstName?.[0]}{faculty.lastName?.[0]}</AvatarFallback>
+                  <AvatarImage
+                    src={faculty.profile}
+                    alt={`${faculty.firstName} ${faculty.lastName}`}
+                  />
+                  <AvatarFallback>
+                    {faculty.firstName?.[0]}
+                    {faculty.lastName?.[0]}
+                  </AvatarFallback>
                 </Avatar>
               </TableCell>
               <TableCell>{`${faculty.firstName} ${faculty.lastName}`}</TableCell>

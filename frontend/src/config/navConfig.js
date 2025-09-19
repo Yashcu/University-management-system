@@ -10,7 +10,7 @@ import {
   User,
   Bell,
   GraduationCap,
-  BookMarked
+  BookMarked,
 } from 'lucide-react';
 
 export const navConfig = {
@@ -37,5 +37,5 @@ export const navConfig = {
     { href: 'timetable', icon: Calendar, label: 'Timetable' },
     { href: 'material', icon: BookMarked, label: 'Materials' },
     { href: 'notice', icon: Bell, label: 'Notices' },
-  ]
+  ],
 };

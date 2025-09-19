@@ -10,7 +10,9 @@ const forgetPassword = (emailData) => {
 };
 
 const updatePassword = (token, type, passwordData) => {
-  return axiosWrapper.post(`/${type}/update-password/${token}`, { password: passwordData.newPassword });
+  return axiosWrapper.post(`/${type}/update-password/${token}`, {
+    password: passwordData.newPassword,
+  });
 };
 
 const updateLoggedInPassword = (passwordData) => {

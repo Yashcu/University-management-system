@@ -64,7 +64,7 @@ const Faculty = () => {
   };
 
   const handleBranchChange = (value) => {
-    setSearchParams({ ...searchParams, branch: value === 'all' ? '' : value});
+    setSearchParams({ ...searchParams, branch: value === 'all' ? '' : value });
   };
 
   return (

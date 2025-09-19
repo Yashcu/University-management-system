@@ -6,9 +6,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import CustomButton from '../../../components/ui/CustomButton';
-import { Badge } from "@/components/ui/badge";
+import { Badge } from '@/components/ui/badge';
 
 const NoticeTable = ({ notices, onEdit, onDelete }) => {
   return (
@@ -27,14 +27,22 @@ const NoticeTable = ({ notices, onEdit, onDelete }) => {
             <TableRow key={notice._id}>
               <TableCell className="font-medium">{notice.title}</TableCell>
               <TableCell>
-                <Badge variant={
-                  notice.target === 'student' ? 'default' :
-                  notice.target === 'faculty' ? 'secondary' : 'outline'
-                }>
-                  {notice.target.charAt(0).toUpperCase() + notice.target.slice(1)}
+                <Badge
+                  variant={
+                    notice.target === 'student'
+                      ? 'default'
+                      : notice.target === 'faculty'
+                        ? 'secondary'
+                        : 'outline'
+                  }
+                >
+                  {notice.target.charAt(0).toUpperCase() +
+                    notice.target.slice(1)}
                 </Badge>
               </TableCell>
-              <TableCell>{new Date(notice.date).toLocaleDateString()}</TableCell>
+              <TableCell>
+                {new Date(notice.date).toLocaleDateString()}
+              </TableCell>
               <TableCell className="text-right">
                 <CustomButton
                   variant="outline"

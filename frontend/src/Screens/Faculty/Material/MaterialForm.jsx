@@ -10,22 +10,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 const materialSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   subjectId: z.string().min(1, 'Subject must be selected'),
-  file: z
-    .any()
-    .refine((files) => files?.length == 1, "File is required."),
+  file: z.any().refine((files) => files?.length == 1, 'File is required.'),
 });
 
 const MaterialForm = ({ onUpsert, onCancel, isProcessing, subjects }) => {

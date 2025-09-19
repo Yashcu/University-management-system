@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import CustomButton from '../../../components/ui/CustomButton';
 
 const BranchTable = ({ branches, onEdit, onDelete }) => {

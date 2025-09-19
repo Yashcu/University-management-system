@@ -12,7 +12,13 @@ import SubjectForm from './SubjectForm';
 import SubjectTable from './SubjectTable';
 import toast from 'react-hot-toast';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const Subject = () => {
   const [branches, setBranches] = useState([]);

@@ -6,12 +6,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const MarksTable = ({ students, marks, handleMarksChange }) => {
-  const mediaUrl = import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
+  const mediaUrl =
+    import.meta.env.VITE_MEDIA_BASE_URL || 'http://localhost:4000';
 
   return (
     <div className="rounded-md border">
@@ -29,7 +30,14 @@ const MarksTable = ({ students, marks, handleMarksChange }) => {
             <TableRow key={student._id}>
               <TableCell>
                 <Avatar>
-                  <AvatarImage src={student.profile ? `${mediaUrl}/media/${student.profile}` : '/assets/avatar.png'} alt={student.name} />
+                  <AvatarImage
+                    src={
+                      student.profile
+                        ? `${mediaUrl}/media/${student.profile}`
+                        : '/assets/avatar.png'
+                    }
+                    alt={student.name}
+                  />
                   <AvatarFallback>{student.name?.[0]}</AvatarFallback>
                 </Avatar>
               </TableCell>
@@ -40,7 +48,9 @@ const MarksTable = ({ students, marks, handleMarksChange }) => {
                   type="number"
                   placeholder="Enter marks"
                   value={marks[student._id] || ''}
-                  onChange={(e) => handleMarksChange(student._id, e.target.value)}
+                  onChange={(e) =>
+                    handleMarksChange(student._id, e.target.value)
+                  }
                   className="max-w-xs"
                 />
               </TableCell>

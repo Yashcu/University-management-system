@@ -23,12 +23,13 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [studentRes, facultyRes, subjectRes, branchRes] = await Promise.all([
-          studentService.search(),
-          facultyService.search(),
-          subjectService.search(),
-          branchService.search(),
-        ]);
+        const [studentRes, facultyRes, subjectRes, branchRes] =
+          await Promise.all([
+            studentService.search(),
+            facultyService.search(),
+            subjectService.search(),
+            branchService.search(),
+          ]);
 
         setStats({
           students: studentRes.data?.data?.length || 0,
@@ -51,10 +52,26 @@ const AdminDashboard = () => {
       <Heading title="Admin Dashboard" />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 my-6">
-        <StatCard title="Total Students" value={isLoading ? '...' : stats.students} icon={Users} />
-        <StatCard title="Total Faculty" value={isLoading ? '...' : stats.faculty} icon={UserCheck} />
-        <StatCard title="Total Subjects" value={isLoading ? '...' : stats.subjects} icon={BookOpen} />
-        <StatCard title="Total Branches" value={isLoading ? '...' : stats.branches} icon={Building} />
+        <StatCard
+          title="Total Students"
+          value={isLoading ? '...' : stats.students}
+          icon={Users}
+        />
+        <StatCard
+          title="Total Faculty"
+          value={isLoading ? '...' : stats.faculty}
+          icon={UserCheck}
+        />
+        <StatCard
+          title="Total Subjects"
+          value={isLoading ? '...' : stats.subjects}
+          icon={BookOpen}
+        />
+        <StatCard
+          title="Total Branches"
+          value={isLoading ? '...' : stats.branches}
+          icon={Building}
+        />
       </div>
 
       <div className="mt-8">

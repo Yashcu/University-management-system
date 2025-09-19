@@ -12,8 +12,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const ViewMarks = () => {
@@ -35,7 +41,9 @@ const ViewMarks = () => {
     if (!selectedExam) return;
     setIsLoading(true);
     try {
-      const { data } = await marksService.getMarksByStudent({ examId: selectedExam });
+      const { data } = await marksService.getMarksByStudent({
+        examId: selectedExam,
+      });
       setMarks(data?.data || []);
     } catch (error) {
       toast.error('Failed to fetch marks for the selected exam.');
@@ -52,7 +60,7 @@ const ViewMarks = () => {
     getMarks();
   }, [getMarks]);
 
-  const selectedExamDetails = exams.find(e => e._id === selectedExam);
+  const selectedExamDetails = exams.find((e) => e._id === selectedExam);
 
   return (
     <div>
@@ -93,9 +101,13 @@ const ViewMarks = () => {
                 <TableBody>
                   {marks.map((mark) => (
                     <TableRow key={mark._id}>
-                      <TableCell className="font-medium">{mark.subjectId.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {mark.subjectId.name}
+                      </TableCell>
                       <TableCell>{mark.subjectId.code}</TableCell>
-                      <TableCell className="text-right font-bold">{mark.marks}</TableCell>
+                      <TableCell className="text-right font-bold">
+                        {mark.marks}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -104,7 +116,13 @@ const ViewMarks = () => {
           </CardContent>
         </Card>
       ) : (
-        <NoData message={selectedExam ? "No marks found for this exam." : "Please select an exam to see your marks."} />
+        <NoData
+          message={
+            selectedExam
+              ? 'No marks found for this exam.'
+              : 'Please select an exam to see your marks.'
+          }
+        />
       )}
     </div>
   );

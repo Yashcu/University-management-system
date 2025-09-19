@@ -11,7 +11,13 @@ import { useCrud } from '../../../hooks/useCrud';
 import TimetableForm from './TimetableForm';
 import TimetableTable from './TimetableTable';
 import toast from 'react-hot-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const Timetable = () => {
   const [branches, setBranches] = useState([]);
@@ -59,7 +65,9 @@ const Timetable = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <Heading title="Manage Timetables" />
-        <CustomButton onClick={() => openModal()}>Upload Timetable</CustomButton>
+        <CustomButton onClick={() => openModal()}>
+          Upload Timetable
+        </CustomButton>
       </div>
 
       <div className="mb-6 max-w-xs">
@@ -83,10 +91,7 @@ const Timetable = () => {
       ) : timetables.length === 0 ? (
         <NoData />
       ) : (
-        <TimetableTable
-          timetables={timetables}
-          onDelete={openDeleteConfirm}
-        />
+        <TimetableTable timetables={timetables} onDelete={openDeleteConfirm} />
       )}
 
       {isModalOpen && (

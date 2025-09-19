@@ -10,21 +10,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 const noticeSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
-  type: z.enum(['student', 'faculty', 'both'], { required_error: 'Target audience is required' }),
+  type: z.enum(['student', 'faculty', 'both'], {
+    required_error: 'Target audience is required',
+  }),
 });
 
 const NoticeForm = ({

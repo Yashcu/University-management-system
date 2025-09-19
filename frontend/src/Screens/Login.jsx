@@ -3,10 +3,23 @@ import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { authService } from '../services/authService';
 import { loginSuccess, fetchUserProfile } from '../redux/authSlice';
 
@@ -28,7 +41,7 @@ const Login = () => {
     toast.loading('Logging In...');
 
     try {
-      const { data } = await authService.login({ email, password, userType })
+      const { data } = await authService.login({ email, password, userType });
       toast.dismiss();
 
       if (data.success) {
@@ -51,7 +64,9 @@ const Login = () => {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your email below to login to your account.</CardDescription>
+          <CardDescription>
+            Enter your email below to login to your account.
+          </CardDescription>
         </CardHeader>
         <form onSubmit={loginHandler}>
           <CardContent className="grid gap-4">
@@ -91,12 +106,16 @@ const Login = () => {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col">
-            <Button className="w-full" type="submit" loading={loading} disabled={loading}>
+            <Button
+              className="w-full"
+              type="submit"
+              loading={loading}
+              disabled={loading}
+            >
               Sign in
             </Button>
             <div className="mt-4 text-center text-sm">
-              <Link to="/forget-password"
-                className="underline">
+              <Link to="/forget-password" className="underline">
                 Forgot your password?
               </Link>
             </div>
