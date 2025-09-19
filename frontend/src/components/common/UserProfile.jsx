@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'; // FIX: Added useSelecto
 import toast from 'react-hot-toast';
 import Heading from '../ui/Heading';
 import Loading from '../ui/Loading';
-import CustomButton from '../ui/CustomButton';
+import { Button } from '../ui/Button';
 import UpdatePasswordLoggedIn from '../UpdatePasswordLoggedIn';
 import { profileService } from '../../services/profileService';
 import { fetchUserProfile } from '../../redux/authSlice';
@@ -192,20 +192,20 @@ const UserProfile = () => {
               {renderExtraFields()}
 
               <div className="flex justify-between items-center pt-4 border-t">
-                <CustomButton
+                <Button
                   type="submit"
                   loading={isProcessing}
                   disabled={isProcessing}
                 >
                   Update Profile
-                </CustomButton>
-                <CustomButton
+                </Button>
+                <Button
                   type="button"
                   variant="secondary"
                   onClick={() => setIsPasswordModalOpen(true)}
                 >
                   Change Password
-                </CustomButton>
+                </Button>
               </div>
             </form>
           </div>

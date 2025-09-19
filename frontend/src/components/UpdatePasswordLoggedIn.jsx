@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import axiosWrapper from '../utils/AxiosWrapper';
+import axiosWrapper from '../lib/AxiosWrapper';
 import { IoMdClose } from 'react-icons/io';
-import CustomButton from './ui/CustomButton';
+import { Button } from './ui/Button';
 import Modal from './ui/Modal';
 
 const UpdatePasswordLoggedIn = ({ isOpen, onClose }) => {
@@ -99,12 +99,12 @@ const UpdatePasswordLoggedIn = ({ isOpen, onClose }) => {
           />
         </div>
         <div className="flex justify-end gap-4">
-          <CustomButton type="button" variant="secondary" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
-          </CustomButton>
-          <CustomButton type="submit" loading={isLoading} disabled={isLoading}>
+          </Button>
+          <Button type="submit" loading={isLoading} disabled={isLoading}>
             Update Password
-          </CustomButton>
+          </Button>
         </div>
       </form>
     </Modal>

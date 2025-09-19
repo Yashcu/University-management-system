@@ -1,4 +1,4 @@
-import axiosWrapper from '../utils/AxiosWrapper';
+import axiosWrapper from '../lib/AxiosWrapper';
 
 const login = (credentials) => {
   return axiosWrapper.post(`/${credentials.userType}/login`, credentials);

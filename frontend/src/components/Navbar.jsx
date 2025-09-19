@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import CustomButton from './ui/CustomButton';
+import { Button } from './ui/Button';
 
 const Navbar = ({ userType, onLogout }) => {
   const location = useLocation();
@@ -76,9 +76,9 @@ const Navbar = ({ userType, onLogout }) => {
             </ul>
           </div>
           <div className="flex-shrink-0">
-            <CustomButton variant="danger" onClick={onLogout}>
+            <Button variant="danger" onClick={onLogout}>
               Logout
-            </CustomButton>
+            </Button>
           </div>
         </div>
       </div>

@@ -1,20 +1,12 @@
-import axiosWrapper from '../utils/AxiosWrapper';
+import axiosWrapper from '../lib/AxiosWrapper';
+import { getAuthHeaders } from '../lib/apiHelpers';
 
-const getHeaders = () => ({
-  Authorization: `Bearer ${localStorage.getItem('userToken')}`,
-});
-
-const getStudentsForMarksEntry = (params) => {
-  return axiosWrapper.get('/marks/students', { headers: getHeaders(), params });
-};
-
-const addBulkMarks = (marksData) => {
-  return axiosWrapper.post('/marks/bulk', marksData, { headers: getHeaders() });
-};
-
-const getStudentMarks = (params) => {
-  return axiosWrapper.get('/marks/student', { headers: getHeaders(), params });
-};
+const getStudentsForMarksEntry = (params) =>
+  axiosWrapper.get('/marks/students', { headers: getAuthHeaders(), params });
+const addBulkMarks = (marksData) =>
+  axiosWrapper.post('/marks/bulk', marksData, { headers: getAuthHeaders() });
+const getStudentMarks = (params) =>
+  axiosWrapper.get('/marks/student', { headers: getAuthHeaders(), params });
 
 export const marksService = {
   getStudentsForMarksEntry,
