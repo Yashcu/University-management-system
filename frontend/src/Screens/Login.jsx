@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { authService } from '../services/authService';
-import { loginSuccess } from '../redux/authSlice';
+import { loginSuccess, fetchUserProfile } from '../redux/authSlice';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -28,11 +28,12 @@ const Login = () => {
     toast.loading('Logging In...');
 
     try {
-      const { data } = await authService.login({ email, password, userType });
-
+      const { data } = await authService.login({ email, password, userType })
       toast.dismiss();
+
       if (data.success) {
         dispatch(loginSuccess({ userToken: data.data.token, userType }));
+        await dispatch(fetchUserProfile());
         toast.success('Login Successful!');
         navigate(`/${userType}`);
       }

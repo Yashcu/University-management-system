@@ -1,3 +1,8 @@
 import { createCrudService } from './api';
 
-export const branchService = createCrudService('branch');
+const baseService = createCrudService('branch');
+
+export const branchService = {
+  ...baseService,
+  add: (data) => baseService.add(data, ''),
+};

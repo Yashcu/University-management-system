@@ -1,6 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { IoMdClose } from 'react-icons/io';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import CustomButton from '../../../components/ui/CustomButton';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const adminSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().regex(/^\d{10}$/, 'Phone must be 10 digits'),
+  gender: z.enum(['male', 'female', 'other']),
+  dob: z.string().refine((val) => !isNaN(Date.parse(val)), 'A valid date is required.'),
+  designation: z.string().min(1, 'Designation is required'),
+  joiningDate: z.string().refine((val) => !isNaN(Date.parse(val)), 'A valid date is required.'),
+  salary: z.coerce.number().positive('Salary must be a positive number'),
+  address: z.string().min(1, 'Address is required'),
+  city: z.string().min(1, 'City is required'),
+  state: z.string().min(1, 'State is required'),
+  pincode: z.string().regex(/^\d{6}$/, 'Pincode must be 6 digits'),
+  country: z.string().min(1, 'Country is required'),
+  profile: z.any().optional(),
+});
+
 
 const AdminForm = ({
   isEditing,
@@ -9,410 +33,259 @@ const AdminForm = ({
   onCancel,
   isProcessing,
 }) => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    pincode: '',
-    country: '',
-    gender: '',
-    dob: '',
-    designation: '',
-    joiningDate: '',
-    salary: '',
-    bloodGroup: '',
-    emergencyContact: {
-      name: '',
-      relationship: '',
+  const form = useForm({
+    resolver: zodResolver(adminSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
       phone: '',
+      gender: '',
+      dob: '',
+      designation: '',
+      joiningDate: '',
+      salary: '',
+      address: '',
+      city: '',
+      state: '',
+      pincode: '',
+      country: '',
+      profile: null,
     },
   });
-  const [file, setFile] = useState(null);
 
   useEffect(() => {
     if (isEditing && selectedItem) {
-      setFormData({
-        firstName: selectedItem.firstName || '',
-        lastName: selectedItem.lastName || '',
-        email: selectedItem.email || '',
-        phone: selectedItem.phone || '',
-        address: selectedItem.address || '',
-        city: selectedItem.city || '',
-        state: selectedItem.state || '',
-        pincode: selectedItem.pincode || '',
-        country: selectedItem.country || '',
-        gender: selectedItem.gender || '',
-        dob: selectedItem.dob?.split('T')[0] || '',
-        designation: selectedItem.designation || '',
-        joiningDate: selectedItem.joiningDate?.split('T')[0] || '',
-        salary: selectedItem.salary || '',
-        bloodGroup: selectedItem.bloodGroup || '',
-        emergencyContact: {
-          name: selectedItem.emergencyContact?.name || '',
-          relationship: selectedItem.emergencyContact?.relationship || '',
-          phone: selectedItem.emergencyContact?.phone || '',
-        },
+      form.reset({
+        ...selectedItem,
+        dob: selectedItem.dob ? new Date(selectedItem.dob).toISOString().split('T')[0] : '',
+        joiningDate: selectedItem.joiningDate ? new Date(selectedItem.joiningDate).toISOString().split('T')[0] : '',
       });
+    } else {
+      form.reset();
     }
-  }, [isEditing, selectedItem]);
+  }, [isEditing, selectedItem, form]);
 
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleEmergencyContactChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      emergencyContact: { ...prev.emergencyContact, [field]: value },
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formDataToSend = new FormData();
-    for (const key in formData) {
-      if (key === 'emergencyContact') {
-        for (const subKey in formData.emergencyContact) {
-          formDataToSend.append(
-            `emergencyContact[${subKey}]`,
-            formData.emergencyContact[subKey]
-          );
+  const onSubmit = (data) => {
+    const formData = new FormData();
+    Object.keys(data).forEach((key) => {
+      if (key === 'profile') {
+        if (data.profile && data.profile.length > 0) {
+          formData.append('file', data.profile[0]);
         }
       } else {
-        formDataToSend.append(key, formData[key]);
+        formData.append(key, data[key]);
       }
-    }
-    if (file) {
-      formDataToSend.append('file', file);
-    }
-    onUpsert(formDataToSend);
+    });
+    onUpsert(formData);
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 w-[90%] max-w-4xl max-h-[90vh] overflow-y-auto relative">
-        <button
-          onClick={onCancel}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
-        >
-          <IoMdClose className="text-2xl" />
-        </button>
-        <h2 className="text-2xl font-semibold mb-6">
-          {isEditing ? 'Edit Admin' : 'Add New Admin'}
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Profile Photo
-              </label>
-              <input
-                type="file"
-                onChange={(e) => setFile(e.target.files[0])}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                accept="image/*"
-              />
-            </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="firstName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>First Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter first name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="lastName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Last Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter last name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl><Input type="email" placeholder="email@example.com" {...field} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+        <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl><Input placeholder="10-digit phone number" {...field} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+         <FormField
+          control={form.control}
+          name="gender"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Gender</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="dob"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Date of Birth</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+         <FormField
+          control={form.control}
+          name="designation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Designation</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. Manager" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="joiningDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Joining Date</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="salary"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Salary</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="Enter salary" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+         <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem className="md:col-span-2">
+              <FormLabel>Address</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter full address" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="city"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>City</FormLabel>
+              <FormControl><Input placeholder="Enter city" {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="state"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>State</FormLabel>
+              <FormControl><Input placeholder="Enter state" {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="pincode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Pincode</FormLabel>
+              <FormControl><Input placeholder="Enter 6-digit pincode" {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="country"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Country</FormLabel>
+              <FormControl><Input placeholder="Enter country" {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+         <FormField
+          control={form.control}
+          name="profile"
+          render={({ field }) => (
+            <FormItem className="md:col-span-2">
+              <FormLabel>Profile Picture</FormLabel>
+              <FormControl>
+                <Input type="file" onChange={(e) => field.onChange(e.target.files)} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                First Name
-              </label>
-              <input
-                type="text"
-                value={formData.firstName}
-                onChange={(e) => handleInputChange('firstName', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Last Name
-              </label>
-              <input
-                type="text"
-                value={formData.lastName}
-                onChange={(e) => handleInputChange('lastName', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone
-              </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Gender
-              </label>
-              <select
-                value={formData.gender}
-                onChange={(e) => handleInputChange('gender', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date of Birth
-              </label>
-              <input
-                type="date"
-                value={formData.dob}
-                onChange={(e) => handleInputChange('dob', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Blood Group
-              </label>
-              <select
-                value={formData.bloodGroup}
-                onChange={(e) =>
-                  handleInputChange('bloodGroup', e.target.value)
-                }
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">Select Blood Group</option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Designation
-              </label>
-              <input
-                type="text"
-                value={formData.designation}
-                onChange={(e) =>
-                  handleInputChange('designation', e.target.value)
-                }
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Joining Date
-              </label>
-              <input
-                type="date"
-                value={formData.joiningDate}
-                onChange={(e) =>
-                  handleInputChange('joiningDate', e.target.value)
-                }
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Salary
-              </label>
-              <input
-                type="number"
-                value={formData.salary}
-                onChange={(e) => handleInputChange('salary', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Address
-              </label>
-              <input
-                type="text"
-                value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                City
-              </label>
-              <input
-                type="text"
-                value={formData.city}
-                onChange={(e) => handleInputChange('city', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                State
-              </label>
-              <input
-                type="text"
-                value={formData.state}
-                onChange={(e) => handleInputChange('state', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Pincode
-              </label>
-              <input
-                type="text"
-                value={formData.pincode}
-                onChange={(e) => handleInputChange('pincode', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Country
-              </label>
-              <input
-                type="text"
-                value={formData.country}
-                onChange={(e) => handleInputChange('country', e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <h3 className="text-lg font-semibold mb-4">
-                Emergency Contact
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.emergencyContact.name}
-                    onChange={(e) =>
-                      handleEmergencyContactChange('name', e.target.value)
-                    }
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Relationship
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.emergencyContact.relationship}
-                    onChange={(e) =>
-                      handleEmergencyContactChange(
-                        'relationship',
-                        e.target.value
-                      )
-                    }
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.emergencyContact.phone}
-                    onChange={(e) =>
-                      handleEmergencyContactChange('phone', e.target.value)
-                    }
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 flex justify-between items-center gap-4">
-            <div>
-              {!isEditing && (
-                <p className="text-sm">
-                  Default password will be{' '}
-                  <span className="font-bold">admin123</span>
-                </p>
-              )}
-            </div>
-            <div className="flex gap-4">
-              <CustomButton
-                type="button"
-                variant="secondary"
-                onClick={onCancel}
-              >
-                Cancel
-              </CustomButton>
-              <CustomButton type="submit" loading={isProcessing} disabled={isProcessing}>
-                {isEditing ? 'Update Admin' : 'Add Admin'}
-              </CustomButton>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="md:col-span-2 flex justify-end gap-4 pt-4 border-t mt-6">
+          <CustomButton type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </CustomButton>
+          <CustomButton type="submit" loading={isProcessing} disabled={isProcessing}>
+            {isEditing ? 'Update Admin' : 'Add Admin'}
+          </CustomButton>
+        </div>
+      </form>
+    </Form>
   );
 };
 

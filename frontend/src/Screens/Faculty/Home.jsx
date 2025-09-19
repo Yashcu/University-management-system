@@ -2,26 +2,26 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
-import Navbar from '../../components/Navbar';
-import StudentFinder from './StudentFinder';
+import SideNavbar from '../../components/SideNavbar';
 import Material from './Material/Material';
 import Timetable from './TimeTable/Timetable';
 import AddMarks from './AddMarks';
 import UserProfile from '../../components/common/UserProfile';
 import Notice from '../Notice';
-import Exam from '../Exam';
 import { logout } from '../../redux/authSlice';
+import Heading from '../../components/ui/Heading';
+
+// A simple dashboard placeholder for Faculty
+const FacultyDashboard = () => <Heading title="Faculty Dashboard" />;
 
 const Home = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  // Logic is now here, in the parent component
   const userType = useSelector((state) => state.auth.userType);
 
   const searchParams = new URLSearchParams(location.search);
-  const selectedMenu = searchParams.get('page') || 'student-finder';
+  const selectedMenu = searchParams.get('page') || 'home';
 
   const logoutHandler = () => {
     dispatch(logout());
@@ -30,8 +30,8 @@ const Home = () => {
 
   const renderContent = () => {
     switch (selectedMenu) {
-      case 'student-finder':
-        return <StudentFinder />;
+      case 'home':
+        return <FacultyDashboard />;
       case 'material':
         return <Material />;
       case 'timetable':
@@ -40,24 +40,23 @@ const Home = () => {
         return <AddMarks />;
       case 'notice':
         return <Notice />;
-      case 'exam':
-        return <Exam />;
       case 'profile':
         return <UserProfile />;
       default:
-        return <StudentFinder />;
+        return <FacultyDashboard />;
     }
   };
 
   return (
-    <>
-      <Navbar userType={userType} onLogout={logoutHandler} />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {renderContent()}
+    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      <SideNavbar userType={userType} onLogout={logoutHandler} />
+      <div className="flex flex-col">
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          {renderContent()}
+        </main>
       </div>
       <Toaster position="bottom-center" />
-    </>
+    </div>
   );
 };
 

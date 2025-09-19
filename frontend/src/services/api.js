@@ -16,8 +16,8 @@ export const createCrudService = (endpoint) => {
   return {
     search: (params) =>
       axiosWrapper.get(`/${endpoint}`, { headers: getHeaders(), params }),
-    add: (data) =>
-      axiosWrapper.post(`/${endpoint}/register`, data, {
+    add: (data, path = '/register') =>
+      axiosWrapper.post(`/${endpoint}${path}`, data, {
         headers: getHeaders(data instanceof FormData),
       }),
     update: (id, data) =>

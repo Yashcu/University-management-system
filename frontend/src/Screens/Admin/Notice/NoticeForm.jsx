@@ -23,8 +23,8 @@ import {
 
 const noticeSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  content: z.string().min(1, 'Content is required'),
-  target: z.string().min(1, 'Target audience is required'),
+  description: z.string().min(1, 'Description is required'),
+  type: z.enum(['student', 'faculty', 'both'], { required_error: 'Target audience is required' }),
 });
 
 const NoticeForm = ({
@@ -38,16 +38,16 @@ const NoticeForm = ({
     resolver: zodResolver(noticeSchema),
     defaultValues: {
       title: selectedItem?.title || '',
-      content: selectedItem?.content || '',
-      target: selectedItem?.target || '',
+      description: selectedItem?.description || '',
+      type: selectedItem?.type || '',
     },
   });
 
   useEffect(() => {
     form.reset({
       title: selectedItem?.title || '',
-      content: selectedItem?.content || '',
-      target: selectedItem?.target || '',
+      description: selectedItem?.description || '',
+      type: selectedItem?.type || '',
     });
   }, [isEditing, selectedItem, form]);
 
@@ -71,12 +71,13 @@ const NoticeForm = ({
             </FormItem>
           )}
         />
+        {/* FIX: Field name changed to 'description' */}
         <FormField
           control={form.control}
-          name="content"
+          name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Content</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Enter the notice details here."
@@ -88,9 +89,10 @@ const NoticeForm = ({
             </FormItem>
           )}
         />
+        {/* FIX: Field name changed to 'type' */}
         <FormField
           control={form.control}
-          name="target"
+          name="type"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Target Audience</FormLabel>
@@ -101,9 +103,9 @@ const NoticeForm = ({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="student">Students</SelectItem>
-                  <SelectItem value="faculty">Faculty</SelectItem>
+                  <SelectItem value="both">All</SelectItem>
+                  <SelectItem value="student">Students Only</SelectItem>
+                  <SelectItem value="faculty">Faculty Only</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
