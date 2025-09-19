@@ -1,4 +1,4 @@
-const studentDetails = require('../models/details/student-details.model');
+const studentDetails = require('../models/student.model');
 const resetToken = require('../models/reset-password.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -6,6 +6,7 @@ const sendResetMail = require('../utils/SendMail');
 const config = require('../config');
 const { USER_ROLES, JWT_EXPIRATION } = require('../utils/constants');
 const ApiError = require('../utils/ApiError');
+const { checkIfExists } = require('../utils/user.utils');
 
 const loginStudent = async (loginData) => {
   const { email, password } = loginData;
@@ -25,7 +26,7 @@ const loginStudent = async (loginData) => {
 };
 
 const getAllDetails = async () => {
-  return studentDetails.find().select('-__v -password').populate('branchId').lean();
+  return studentDetails.find().select('-__v -password').populate('branchId');
 };
 
 const registerStudent = async (studentData, file) => {
@@ -64,9 +65,9 @@ const checkForExistingStudent = async (query, errorMessage) => {
 const updateDetails = async (studentId, studentData, file) => {
   const { email, phone, password, enrollmentNo } = studentData;
 
-  if (phone) await checkForExistingStudent({ _id: { $ne: studentId }, phone }, 'Phone number already in use');
-  if (email) await checkForExistingStudent({ _id: { $ne: studentId }, email }, 'Email already in use');
-  if (enrollmentNo) await checkForExistingStudent({ _id: { $ne: studentId }, enrollmentNo }, 'Enrollment number already in use');
+  if (phone) await checkIfExists({ _id: { $ne: studentId }, phone }, 'Phone number already in use');
+  if (email) await checkIfExists({ _id: { $ne: studentId }, email }, 'Email already in use');
+  if (enrollmentNo) await checkIfExists({ _id: { $ne: studentId }, enrollmentNo }, 'Enrollment number already in use');
 
   if (password) {
     studentData.password = await bcrypt.hash(password, 10);

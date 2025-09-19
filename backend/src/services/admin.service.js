@@ -1,4 +1,4 @@
-const adminDetails = require('../models/details/admin-details.model');
+const adminDetails = require('../models/admin.model');
 const resetToken = require('../models/reset-password.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -6,6 +6,7 @@ const sendResetMail = require('../utils/SendMail');
 const config = require('../config');
 const { USER_ROLES, JWT_EXPIRATION } = require('../utils/constants');
 const ApiError = require('../utils/ApiError');
+const { checkIfExists } = require('../utils/user.utils');
 
 const loginAdmin = async (loginData) => {
   const { email, password } = loginData;
@@ -40,13 +41,11 @@ const getAllDetails = async () => {
 const registerAdmin = async (adminData, file) => {
   const { email, phone } = adminData;
 
-  const existingAdmin = await adminDetails.findOne({
-    $or: [{ phone }, { email }],
-  });
-
-  if (existingAdmin) {
-    throw new ApiError(409, 'Admin with these details already exists');
-  }
+  await checkIfExists(
+    adminDetails,
+    { $or: [{ phone }, { email }] },
+    'Admin with this email or phone number already exists'
+  );
 
   const employeeId = Math.floor(100000 + Math.random() * 900000);
 
@@ -73,25 +72,19 @@ const updateDetails = async (adminId, adminData, file) => {
   const { email, phone, password } = adminData;
 
   if (phone) {
-    const existingAdmin = await adminDetails.findOne({
-      _id: { $ne: adminId },
-      phone: phone,
-    });
-
-    if (existingAdmin) {
-      throw new ApiError(409, 'Phone number already in use');
-    }
+    await checkIfExists(
+      adminDetails,
+      { _id: { $ne: adminId }, phone: phone },
+      'Phone number already in use'
+    );
   }
 
   if (email) {
-    const existingAdmin = await adminDetails.findOne({
-      _id: { $ne: adminId },
-      email: email,
-    });
-
-    if (existingAdmin) {
-      throw new ApiError(409, 'Email already in use');
-    }
+    await checkIfExists(
+      adminDetails,
+      { _id: { $ne: adminId }, email: email },
+      'Email already in use'
+    );
   }
 
   if (password) {

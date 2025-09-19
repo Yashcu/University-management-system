@@ -4,7 +4,7 @@ const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
 const addMaterialSchema = z.object({
   body: z.object({
-    title: z.string().trim().min(1, { message: 'Title is required' }),
+    title: z.string().trim().min(1, { message: 'Title is required' }).max(255),
     subject: z.string().trim().regex(objectIdRegex, 'Invalid Subject ID format'),
     semester: z.coerce.number().int().min(1).max(8),
     branch: z.string().trim().regex(objectIdRegex, 'Invalid Branch ID format'),

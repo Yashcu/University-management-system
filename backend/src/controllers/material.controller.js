@@ -5,10 +5,7 @@ const { USER_ROLES } = require('../utils/constants');
 const getMaterialsController = async (req, res, next) => {
   try {
     const materials = await materialService.getMaterials(req.query);
-    return ApiResponse.success(
-      materials,
-      'Materials retrieved successfully'
-    ).send(res);
+    return ApiResponse.success(materials,'Materials retrieved successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -27,10 +24,7 @@ const addMaterialController = async (req, res, next) => {
       req.file,
       req.user.userId
     );
-    return ApiResponse.created(
-      populatedMaterial,
-      'Material added successfully'
-    ).send(res);
+    return ApiResponse.created(populatedMaterial,'Material created successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -50,10 +44,7 @@ const updateMaterialController = async (req, res, next) => {
       req.file,
       req.user.userId
     );
-    return ApiResponse.success(
-      updatedMaterial,
-      'Material updated successfully'
-    ).send(res);
+    return ApiResponse.success(updatedMaterial,'Material updated successfully').send(res);
   } catch (error) {
     next(error);
   }

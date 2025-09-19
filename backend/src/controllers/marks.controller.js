@@ -14,7 +14,7 @@ const getMarksController = async (req, res, next) => {
 const addMarksController = async (req, res, next) => {
   try {
     const existingMarks = await marksService.addMarks(req.body);
-    return ApiResponse.success(existingMarks, 'Marks updated successfully').send(res);
+    return ApiResponse.success(existingMarks, 'Marks added/updated successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -48,7 +48,7 @@ const getStudentsWithMarksController = async (req, res, next) => {
     const studentsWithMarks = await marksService.getStudentsWithMarks(
       req.query
     );
-    return ApiResponse.success(studentsWithMarks,'Students retrieved successfully with marks').send(res);
+    return ApiResponse.success(studentsWithMarks,'Students with marks retrieved successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -57,7 +57,7 @@ const getStudentsWithMarksController = async (req, res, next) => {
 const getStudentMarksController = async (req, res, next) => {
   try {
     const marks = await marksService.getStudentMarks(req.query, req.userId);
-    return ApiResponse.success(marks, 'Marks retrieved successfully').send(res);
+    return ApiResponse.success(marks, 'Student marks retrieved successfully').send(res);
   } catch (error) {
     next(error);
   }

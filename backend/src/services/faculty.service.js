@@ -1,4 +1,4 @@
-const facultyDetails = require('../models/details/faculty-details.model');
+const facultyDetails = require('../models/faculty.model');
 const resetToken = require('../models/reset-password.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -6,6 +6,7 @@ const sendResetMail = require('../utils/SendMail');
 const config = require('../config');
 const { USER_ROLES, JWT_EXPIRATION } = require('../utils/constants');
 const ApiError = require('../utils/ApiError');
+const { checkIfExists } = require('../utils/user.utils');
 
 const loginFaculty = async (loginData) => {
   const { email, password } = loginData;
@@ -38,12 +39,11 @@ const getAllFaculty = async () => {
 const registerFaculty = async (facultyData, file) => {
   const { email, phone } = facultyData;
 
-  const existing = await facultyDetails.findOne({
-    $or: [{ phone }, { email }],
-  });
-  if (existing) {
-    throw new ApiError(409, 'Faculty with these details already exists');
-  }
+  await checkIfExists(
+    facultyDetails,
+    { $or: [{ phone }, { email }] },
+    'Faculty with this email or phone number already exists'
+  );
 
   const employeeId = Math.floor(100000 + Math.random() * 900000);
 
@@ -61,23 +61,19 @@ const updateFaculty = async (facultyId, facultyData, file) => {
   const { email, phone, password } = facultyData;
 
   if (email) {
-    const existing = await facultyDetails.findOne({
-      _id: { $ne: facultyId },
-      email,
-    });
-    if (existing) {
-      throw new ApiError(409, 'Email already in use');
-    }
+    await checkIfExists(
+      facultyDetails,
+      { _id: { $ne: facultyId }, email },
+      'Email already in use'
+    );
   }
 
   if (phone) {
-    const existing = await facultyDetails.findOne({
-      _id: { $ne: facultyId },
-      phone,
-    });
-    if (existing) {
-      throw new ApiError(409, 'Phone number already in use');
-    }
+    await checkIfExists(
+      facultyDetails,
+      { _id: { $ne: facultyId }, phone },
+      'Phone number already in use'
+    );
   }
 
   if (password) {

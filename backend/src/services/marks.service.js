@@ -1,5 +1,5 @@
 const Marks = require('../models/marks.model');
-const Student = require('../models/details/student-details.model');
+const Student = require('../models/student.model');
 const ApiError = require('../utils/ApiError');
 
 const getMarks = async (queryParams) => {

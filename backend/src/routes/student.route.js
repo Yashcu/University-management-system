@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../../middlewares/multer.middleware');
-const auth = require('../../middlewares/auth.middleware');
-const validate = require('../../middlewares/validation.middleware');
+const upload = require('../middlewares/multer.middleware');
+const auth = require('../middlewares/auth.middleware');
+const validate = require('../middlewares/validation.middleware');
 const {
   loginStudentSchema,
   registerStudentSchema,
@@ -12,7 +12,7 @@ const {
   changePasswordSchema,
   searchStudentsSchema,
   deleteStudentSchema,
-} = require('../../validators/student-details.validator');
+} = require('../validators/student.validator');
 
 const {
   loginStudentController,
@@ -24,7 +24,7 @@ const {
   sendForgetPasswordEmail,
   updatePasswordHandler,
   updateLoggedInPasswordController,
-} = require('../../controllers/details/student-details.controller');
+} = require('../controllers/student.controller');
 
 router.post(
   '/register',

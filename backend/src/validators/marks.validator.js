@@ -2,6 +2,16 @@ const { z } = require('zod');
 
 const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
+const addOrUpdateMarksSchema = z.object({
+  body: z.object({
+    studentId: z.string().trim().regex(objectIdRegex, 'Invalid Student ID format'),
+    subjectId: z.string().trim().regex(objectIdRegex, 'Invalid Subject ID format'),
+    examId: z.string().trim().regex(objectIdRegex, 'Invalid Exam ID format'),
+    semester: z.coerce.number().int().min(1).max(8),
+    marksObtained: z.coerce.number().int().min(0),
+  }),
+});
+
 const addBulkMarksSchema = z.object({
   body: z.object({
     examId: z.string().trim().regex(objectIdRegex, 'Invalid Exam ID format'),
@@ -43,6 +53,7 @@ const deleteMarksSchema = z.object({
 });
 
 module.exports = {
+  addOrUpdateMarksSchema,
   addBulkMarksSchema,
   getStudentsWithMarksSchema,
   getStudentMarksSchema,

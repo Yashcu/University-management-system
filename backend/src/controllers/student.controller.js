@@ -1,15 +1,6 @@
-const studentDetailsService = require('../../services/student-details.service');
-const ApiResponse = require('../../utils/ApiResponse');
-const config = require('../../config');
-
-const addProfileUrl = (user) => {
-  if (user && user.profile) {
-    const userObj = user.toObject ? user.toObject() : user;
-    userObj.profileUrl = `${config.backendUrl}/media/${user.profile}`;
-    return userObj;
-  }
-  return user;
-};
+const studentDetailsService = require('../services/student.service');
+const ApiResponse = require('../utils/ApiResponse');
+const config = require('../config');
 
 const loginStudentController = async (req, res, next) => {
   try {
@@ -28,7 +19,7 @@ const getAllDetailsController = async (req, res, next) => {
     } else {
       users = await studentDetailsService.getAllDetails();
     }
-    return ApiResponse.success(users, 'Student Details Found!').send(res);
+    return ApiResponse.success(users, 'Students retrieved successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -40,9 +31,7 @@ const registerStudentController = async (req, res, next) => {
       req.body,
       req.file
     );
-    return ApiResponse.created(sanitizedUser, 'Student Details Added!').send(
-      res
-    );
+    return ApiResponse.created(sanitizedUser, 'Student registered successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -51,7 +40,7 @@ const registerStudentController = async (req, res, next) => {
 const getMyDetailsController = async (req, res, next) => {
   try {
     const user = await studentDetailsService.getMyDetails(req.userId);
-    return ApiResponse.success(user, 'My Details Found!').send(res);
+    return ApiResponse.success(user, 'Student details retrieved successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -64,7 +53,7 @@ const updateDetailsController = async (req, res, next) => {
       req.body,
       req.file
     );
-    return ApiResponse.success(updatedUser, 'Updated Successfully!').send(res);
+    return ApiResponse.success(updatedUser, 'Student updated successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -73,7 +62,7 @@ const updateDetailsController = async (req, res, next) => {
 const deleteDetailsController = async (req, res, next) => {
   try {
     await studentDetailsService.deleteDetails(req.params.id);
-    return ApiResponse.success(null, 'Deleted Successfully!').send(res);
+    return ApiResponse.success(null, 'Student deleted successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -82,7 +71,7 @@ const deleteDetailsController = async (req, res, next) => {
 const sendForgetPasswordEmail = async (req, res, next) => {
   try {
     await studentDetailsService.sendForgetPasswordEmail(req.body.email);
-    return ApiResponse.success(null, 'Reset Mail Send Successful').send(res);
+    return ApiResponse.success(null, 'Reset email sent successfully').send(res);
   } catch (error) {
     next(error);
   }

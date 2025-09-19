@@ -5,7 +5,7 @@ const getBranchController = async (req, res, next) => {
   try {
     const { search = '' } = req.query;
     const branches = await branchService.getAllBranches(search);
-    return ApiResponse.success(branches, 'All Branches Loaded!').send(res);
+    ApiResponse.success(branches, 'Branches retrieved successfully').send(res);
   } catch (err) {
     next(err);
   }
@@ -14,7 +14,7 @@ const getBranchController = async (req, res, next) => {
 const addBranchController = async (req, res, next) => {
   try {
     const branch = await branchService.addBranch(req.body);
-    return ApiResponse.created(branch, 'Branch Added Successfully!').send(res);
+    ApiResponse.created(branch, 'Branch created successfully').send(res);
   } catch (err) {
     next(err);
   }
@@ -23,9 +23,7 @@ const addBranchController = async (req, res, next) => {
 const updateBranchController = async (req, res, next) => {
   try {
     const branch = await branchService.updateBranch(req.params.id, req.body);
-    return ApiResponse.success(branch, 'Branch Updated Successfully!').send(
-      res
-    );
+    ApiResponse.success(branch, 'Branch updated successfully').send(res);
   } catch (err) {
     next(err);
   }
@@ -34,7 +32,7 @@ const updateBranchController = async (req, res, next) => {
 const deleteBranchController = async (req, res, next) => {
   try {
     await branchService.deleteBranch(req.params.id);
-    return ApiResponse.success(null, 'Branch Deleted Successfully!').send(res);
+    ApiResponse.success(null, 'Branch deleted successfully').send(res);
   } catch (err) {
     next(err);
   }

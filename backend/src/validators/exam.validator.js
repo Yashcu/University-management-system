@@ -4,7 +4,7 @@ const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
 const addExamSchema = z.object({
   body: z.object({
-    name: z.string().trim().min(1, { message: 'Exam name is required' }),
+    name: z.string().trim().min(1, { message: 'Exam name is required' }).max(100),
     date: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: 'Invalid date format',
     }),

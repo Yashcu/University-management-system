@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../../middlewares/multer.middleware');
-const auth = require('../../middlewares/auth.middleware');
-const validate = require('../../middlewares/validation.middleware');
+const upload = require('../middlewares/multer.middleware');
+const auth = require('../middlewares/auth.middleware');
+const validate = require('../middlewares/validation.middleware');
 const {
   loginAdminSchema,
   registerAdminSchema,
@@ -11,7 +11,7 @@ const {
   updatePasswordSchema,
   changePasswordSchema,
   deleteAdminSchema,
-} = require('../../validators/admin-details.validator');
+} = require('../validators/admin.validator');
 
 const {
   getAllDetailsController,
@@ -23,7 +23,7 @@ const {
   sendForgetPasswordEmail,
   updatePasswordHandler,
   updateLoggedInPasswordController,
-} = require('../../controllers/details/admin-details.controller');
+} = require('../controllers/admin.controller');
 
 router.post(
   '/register',

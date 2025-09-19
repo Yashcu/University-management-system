@@ -5,7 +5,7 @@ const { USER_ROLES } = require('../utils/constants');
 const getAllExamsController = async (req, res, next) => {
   try {
     const exams = await examService.getAllExams(req.query);
-    return ApiResponse.success(exams, 'All Exams Loaded!').send(res);
+    ApiResponse.success(exams, 'Exams retrieved successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -20,7 +20,7 @@ const addExamController = async (req, res, next) => {
     }
 
     const exam = await examService.addExam(req.body, req.file);
-    return ApiResponse.success(exam, 'Exam Added Successfully!').send(res);
+    ApiResponse.success(exam, 'Exam created successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -39,7 +39,7 @@ const updateExamController = async (req, res, next) => {
       req.body,
       req.file
     );
-    return ApiResponse.success(exam, 'Exam Updated Successfully!').send(res);
+    ApiResponse.success(exam, 'Exam updated successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -48,7 +48,7 @@ const updateExamController = async (req, res, next) => {
 const deleteExamController = async (req, res, next) => {
   try {
     const exam = await examService.deleteExam(req.params.id);
-    return ApiResponse.success(exam, 'Exam Deleted Successfully!').send(res);
+    ApiResponse.success(exam, 'Exam deleted successfully').send(res);
   } catch (error) {
     next(error);
   }

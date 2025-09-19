@@ -1,4 +1,5 @@
 const { z } = require('zod');
+const { passwordSchema } = require('./common.validator');
 
 const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 const phoneRegex = /^\d{10}$/;
@@ -13,20 +14,55 @@ const loginAdminSchema = z.object({
 
 const registerAdminSchema = z.object({
   body: z.object({
-    firstName: z.string().trim().min(1, 'First name is required'),
-    lastName: z.string().trim().min(1, 'Last name is required'),
-    email: z.string().trim().email('Invalid email format'),
-    phone: z.string().trim().regex(phoneRegex, 'Phone number must be 10 digits'),
-    address: z.string().trim().min(1, 'Address is required'),
-    city: z.string().trim().min(1, 'City is required'),
-    state: z.string().trim().min(1, 'State is required'),
+    firstName: z
+      .string()
+      .trim()
+      .min(1, 'First name is required')
+      .max(50, 'First name cannot exceed 50 characters'),
+    lastName: z
+      .string()
+      .trim()
+      .min(1, 'Last name is required')
+      .max(50, 'Last name cannot exceed 50 characters'),
+    email: z
+      .string()
+      .trim()
+      .email('Invalid email format')
+      .max(100, 'Email cannot exceed 100 characters'),
+    phone: z
+      .string()
+      .trim()
+      .regex(phoneRegex, 'Phone number must be 10 digits'),
+    address: z
+      .string()
+      .trim()
+      .min(1, 'Address is required')
+      .max(255, 'Address cannot exceed 255 characters'),
+    city: z
+      .string()
+      .trim()
+      .min(1, 'City is required')
+      .max(100, 'City cannot exceed 100 characters'),
+    state: z
+      .string()
+      .trim()
+      .min(1, 'State is required')
+      .max(100, 'State cannot exceed 100 characters'),
     pincode: z.string().trim().regex(pincodeRegex, 'Pincode must be 6 digits'),
-    country: z.string().trim().min(1, 'Country is required'),
+    country: z
+      .string()
+      .trim()
+      .min(1, 'Country is required')
+      .max(100, 'Country cannot exceed 100 characters'),
     gender: z.enum(['male', 'female', 'other']),
     dob: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: 'Invalid date of birth format',
     }),
-    designation: z.string().trim().min(1, 'Designation is required'),
+    designation: z
+      .string()
+      .trim()
+      .min(1, 'Designation is required')
+      .max(100, 'Designation cannot exceed 100 characters'),
     joiningDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: 'Invalid joining date format',
     }),
@@ -55,28 +91,65 @@ const updateDetailsSchema = z.object({
     id: z.string().trim().regex(objectIdRegex, 'Invalid ID format'),
   }),
   body: z.object({
-    email: z.string().trim().email('Invalid email format').optional(),
+    email: z
+      .string()
+      .trim()
+      .email('Invalid email format')
+      .max(100, 'Email cannot exceed 100 characters')
+      .optional(),
     phone: z
       .string()
       .trim()
       .regex(phoneRegex, 'Phone number must be 10 digits')
       .optional(),
-    password: z
+    firstName: z
       .string()
-      .min(8, 'Password must be at least 8 characters long')
+      .trim()
+      .min(1)
+      .max(50, 'First name cannot exceed 50 characters')
       .optional(),
-    firstName: z.string().trim().min(1).optional(),
-    lastName: z.string().trim().min(1).optional(),
-    address: z.string().trim().min(1).optional(),
-    city: z.string().trim().min(1).optional(),
-    state: z.string().trim().min(1).optional(),
+    lastName: z
+      .string()
+      .trim()
+      .min(1)
+      .max(50, 'Last name cannot exceed 50 characters')
+      .optional(),
+    address: z
+      .string()
+      .trim()
+      .min(1)
+      .max(255, 'Address cannot exceed 255 characters')
+      .optional(),
+    city: z
+      .string()
+      .trim()
+      .min(1)
+      .max(100, 'City cannot exceed 100 characters')
+      .optional(),
+    state: z
+      .string()
+      .trim()
+      .min(1)
+      .max(100, 'State cannot exceed 100 characters')
+      .optional(),
     pincode: z
       .string()
       .trim()
       .regex(pincodeRegex, 'Pincode must be 6 digits')
       .optional(),
-    country: z.string().trim().min(1).optional(),
-    designation: z.string().trim().min(1).optional(),
+    country: z
+      .string()
+      .trim()
+      .min(1)
+      .max(100, 'Country cannot exceed 100 characters')
+      .optional(),
+    designation: z
+      .string()
+      .trim()
+      .min(1)
+      .max(100, 'Designation cannot exceed 100 characters')
+      .optional(),
+    password: passwordSchema.optional(),
     salary: z.coerce
       .number()
       .int()
@@ -96,16 +169,14 @@ const updatePasswordSchema = z.object({
     resetId: z.string().trim().regex(objectIdRegex, 'Invalid Reset ID format'),
   }),
   body: z.object({
-    password: z.string().min(8, 'Password must be at least 8 characters long'),
+    password: passwordSchema,
   }),
 });
 
 const changePasswordSchema = z.object({
   body: z.object({
     currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: z
-      .string()
-      .min(8, 'New password must be at least 8 characters long'),
+    newPassword: passwordSchema,
   }),
 });
 

@@ -5,10 +5,7 @@ const { USER_ROLES } = require('../utils/constants');
 const getTimetableController = async (req, res, next) => {
   try {
     const timetables = await timetableService.getTimetables(req.query);
-    return ApiResponse.success(
-      timetables,
-      'Timetables retrieved successfully'
-    ).send(res);
+    return ApiResponse.success(timetables,'Timetables retrieved successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -22,9 +19,7 @@ const addTimetableController = async (req, res, next) => {
       ).send(res);
     }
     const timetable = await timetableService.addTimetable(req.body, req.file);
-    return ApiResponse.created(timetable, 'Timetable added successfully').send(
-      res
-    );
+    return ApiResponse.created(timetable, 'Timetable created successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -43,10 +38,7 @@ const updateTimetableController = async (req, res, next) => {
       req.body,
       req.file
     );
-    return ApiResponse.success(
-      timetable,
-      'Timetable updated successfully'
-    ).send(res);
+    return ApiResponse.success(timetable,'Timetable updated successfully').send(res);
   } catch (error) {
     next(error);
   }
@@ -60,9 +52,7 @@ const deleteTimetableController = async (req, res, next) => {
       ).send(res);
     }
     await timetableService.deleteTimetable(req.params.id);
-    return ApiResponse.success(null, 'Timetable deleted successfully').send(
-      res
-    );
+    return ApiResponse.success(null, 'Timetable deleted successfully').send(res);
   } catch (error) {
     next(error);
   }

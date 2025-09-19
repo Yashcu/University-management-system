@@ -1,4 +1,4 @@
-const adminDetails = require('./models/details/admin-details.model');
+const adminDetails = require('./models/admin.model');
 const connectToMongo = require('./database/db');
 const mongoose = require('mongoose');
 const logger = require('../utils/logger');

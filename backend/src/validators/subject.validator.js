@@ -4,8 +4,8 @@ const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
 const addSubjectSchema = z.object({
   body: z.object({
-    name: z.string().trim().min(1, { message: 'Name is required' }),
-    code: z.string().trim().min(1, { message: 'Code is required' }),
+    name: z.string().trim().min(1, { message: 'Name is required' }).max(100),
+    code: z.string().trim().min(1, { message: 'Code is required' }).max(20),
     branch: z.string().trim().regex(objectIdRegex, 'Invalid Branch ID format'),
     semester: z.coerce.number().int().min(1).max(8),
     credits: z.coerce.number().int().min(1),

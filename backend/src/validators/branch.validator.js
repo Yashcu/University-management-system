@@ -2,8 +2,8 @@ const { z } = require('zod');
 
 const addBranchSchema = z.object({
   body: z.object({
-    name: z.string().trim().min(1, { message: 'Branch name is required' }),
-    code: z.string().trim().min(1, { message: 'Branch code is required' }),
+    name: z.string().trim().min(1, { message: 'Branch name is required' }).max(100),
+    code: z.string().trim().min(1, { message: 'Branch code is required' }).max(10),
   }),
 });
 
