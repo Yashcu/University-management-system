@@ -1,35 +1,71 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import mystore from './redux/store';
-import { setupInterceptors } from './lib/AxiosWrapper';
-import 'react-day-picker/dist/style.css';
+// App.jsx - UPDATED VERSION
+import { Toaster } from 'react-hot-toast'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate
+} from 'react-router-dom'
 
-import AuthRoutes from './features/auth/routes';
-import AdminRoutes from './features/admin/routes';
-import FacultyRoutes from './features/faculty/routes';
-import StudentRoutes from './features/student/routes';
-
-setupInterceptors(mystore);
+// Route imports with consistent naming
+import AuthRoutes from '@features/auth/routes'
+import AdminRoutes from '@features/admin/routes'
+import FacultyRoutes from '@features/faculty/routes'
+import StudentRoutes from '@features/student/routes'
 
 const App = () => {
   return (
-    <Provider store={mystore}>
-      <Router>
+    <>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Routes>
-          {/* Public Routes */}
-          <Route path="/*" element={<AuthRoutes />} />
+          {/* Auth Routes (Public) */}
+          <Route path="/auth/*" element={<AuthRoutes />} />
 
           {/* Protected Routes */}
-          <Route path="/student/*" element={<StudentRoutes />} />
-          <Route path="/faculty/*" element={<FacultyRoutes />} />
           <Route path="/admin/*" element={<AdminRoutes />} />
+          <Route path="/faculty/*" element={<FacultyRoutes />} />
+          <Route path="/student/*" element={<StudentRoutes />} />
+
+          {/* Root redirect */}
+          <Route path="/" element={<Navigate to="/auth/login" replace />} />
 
           {/* Fallback for unmatched routes */}
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/auth/login" replace />} />
         </Routes>
       </Router>
-    </Provider>
-  );
-};
 
-export default App;
+      {/* Global Toast Notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#4ade80',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+    </>
+  )
+}
+
+export default App

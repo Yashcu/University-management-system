@@ -1,59 +1,43 @@
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '../../../components/ui/Button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+// features/admin/components/StudentForm.jsx
 
-// Updated Zod schema to match the backend model
-const studentSchema = z.object({
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '../../../components/ui/form'
+import { Input } from '../../../components/ui/input'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../../../components/ui/select'
+import { Button } from '../../../components/ui/button'
+import { Textarea } from '../../../components/ui/textarea'
+
+const schema = z.object({
+  enrollmentNo: z.coerce.number().min(1, 'Enrollment number is required'),
   firstName: z.string().min(1, 'First name is required'),
-  middleName: z.string().optional(),
   lastName: z.string().min(1, 'Last name is required'),
-  phone: z.string().regex(/^\d{10}$/, 'Phone number must be 10 digits'),
-  semester: z.coerce.number().int().min(1).max(8),
-  branchId: z.string().min(1, 'Branch must be selected'),
-  gender: z.enum(['male', 'female', 'other']),
-  dob: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: 'Invalid date of birth format',
-  }),
+  email: z.string().email('Invalid email format'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  semester: z.coerce.number().min(1).max(8, 'Semester must be between 1-8'),
+  branchId: z.string().min(1, 'Branch is required'),
+  gender: z.enum(['male','female','other'], { required_error: 'Gender is required' }),
+  dob: z.string().refine(val => !isNaN(Date.parse(val)), 'Invalid date'),
   address: z.string().min(1, 'Address is required'),
   city: z.string().min(1, 'City is required'),
   state: z.string().min(1, 'State is required'),
-  pincode: z.string().regex(/^\d{6}$/, 'Pincode must be 6 digits'),
+  pincode: z.string().min(6, 'Pincode must be at least 6 digits'),
   country: z.string().min(1, 'Country is required'),
-  profile: z.any().optional(),
-});
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+})
 
-const StudentForm = ({
-  isEditing,
-  selectedItem,
-  onUpsert,
-  onCancel,
-  isProcessing,
-  branches,
-}) => {
+export default function StudentForm({ onSubmit, onCancel, branches = [] }) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const form = useForm({
-    resolver: zodResolver(studentSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
+      enrollmentNo: '',
       firstName: '',
-      middleName: '',
       lastName: '',
+      email: '',
       phone: '',
       semester: '',
       branchId: '',
@@ -63,253 +47,261 @@ const StudentForm = ({
       city: '',
       state: '',
       pincode: '',
-      country: '',
-      profile: null,
-    },
-  });
-
-  useEffect(() => {
-    if (isEditing && selectedItem) {
-      form.reset({
-        ...selectedItem,
-        branchId: selectedItem.branchId?._id || '',
-        dob: selectedItem.dob
-          ? new Date(selectedItem.dob).toISOString().split('T')[0]
-          : '',
-      });
-    } else {
-      form.reset();
+      country: 'India',
+      password: ''
     }
-  }, [isEditing, selectedItem, form]);
+  })
 
-  const onSubmit = (data) => {
-    const formData = new FormData();
-    Object.keys(data).forEach((key) => {
-      if (key === 'profile') {
-        if (data.profile && data.profile.length > 0) {
-          formData.append('file', data.profile[0]);
-        }
-      } else {
-        formData.append(key, data[key]);
-      }
-    });
-    onUpsert(formData);
-  };
+  async function handleSave(values) {
+    setIsSubmitting(true)
+    try {
+      await onSubmit(values)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
-        {/* Add all the new form fields here */}
-        <FormField
-          control={form.control}
-          name="firstName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>First Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter first name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="lastName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Last Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter last name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter phone number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="semester"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Semester</FormLabel>
-              <FormControl>
-                <Input type="number" placeholder="Enter semester" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="branchId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Branch</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a branch" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {branches.map((b) => (
-                    <SelectItem key={b._id} value={b._id}>
-                      {b.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="gender"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Gender</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="dob"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Date of Birth</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem className="md:col-span-2">
-              <FormLabel>Address</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter address" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="city"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>City</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter city" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="state"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>State</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter state" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="pincode"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Pincode</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter pincode" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Country</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter country" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="profile"
-          render={({ field }) => (
-            <FormItem className="md:col-span-2">
-              <FormLabel>Profile Picture</FormLabel>
-              <FormControl>
-                <Input
-                  type="file"
-                  onChange={(e) => field.onChange(e.target.files)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="md:col-span-2 flex justify-end gap-4 pt-4 border-t mt-6">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            loading={isProcessing}
-            disabled={isProcessing}
-          >
-            {isEditing ? 'Update Student' : 'Add Student'}
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
-};
+    <div className="space-y-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
 
-export default StudentForm;
+          {/* Personal Information Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              Personal Information
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField name="enrollmentNo" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Enrollment Number *</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="number" placeholder="Enter enrollment number" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+
+              <FormField name="firstName" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name *</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter first name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+
+              <FormField name="lastName" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name *</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter last name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+
+              <FormField name="email" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email *</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="email" placeholder="Enter email address" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+
+              <FormField name="phone" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone *</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter phone number" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+
+              <FormField name="dob" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date of Birth *</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="date" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+
+              <FormField name="gender" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gender *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+
+              <FormField name="password" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password *</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="password" placeholder="Enter password" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+            </div>
+          </div>
+
+          {/* Academic Information Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              Academic Information
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField name="branchId" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Branch *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select branch" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {branches.map((branch) => (
+                          <SelectItem key={branch._id} value={branch._id}>
+                            {branch.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+
+              <FormField name="semester" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Semester *</FormLabel>
+                    <Select onValueChange={val => field.onChange(Number(val))} value={String(field.value)}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select semester" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {[1,2,3,4,5,6,7,8].map(sem => (
+                          <SelectItem key={sem} value={String(sem)}>
+                            Semester {sem}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+            </div>
+          </div>
+
+          {/* Address Information Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+              Address Information
+            </h3>
+
+            <div className="grid grid-cols-1 gap-4">
+              <FormField name="address" control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address *</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder="Enter full address" rows={3} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}/>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField name="city" control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City *</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter city" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}/>
+
+                <FormField name="state" control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>State *</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter state" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}/>
+
+                <FormField name="pincode" control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pincode *</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter pincode" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}/>
+
+                <FormField name="country" control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country *</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter country" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}/>
+              </div>
+            </div>
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex justify-end gap-4 pt-6 border-t">
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Creating...' : 'Create Student'}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  )
+}

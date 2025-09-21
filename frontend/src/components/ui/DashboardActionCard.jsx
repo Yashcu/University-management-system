@@ -1,28 +1,33 @@
-import React from 'react';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import React from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
+import { Button } from '@components/ui/button'
+import { ArrowRight } from 'lucide-react'
 
-const DashboardActionCard = ({ title, description, link, onNavigate }) => {
+export const DashboardActionCard = ({
+  title,
+  description,
+  icon: Icon,
+  link,
+  onNavigate,
+  color = 'blue'
+}) => {
   return (
-    <Card>
+    <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => onNavigate(link)}>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          {Icon && <Icon className="h-5 w-5" />}
+          {title}
+        </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardFooter>
-        <Button onClick={() => onNavigate(link)} className="w-full">
-          Manage <ArrowRight className="ml-2 h-4 w-4" />
+      <CardContent>
+        <Button variant="ghost" className="w-full justify-between">
+          Get Started
+          <ArrowRight className="h-4 w-4" />
         </Button>
-      </CardFooter>
+      </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default DashboardActionCard;
+export default DashboardActionCard

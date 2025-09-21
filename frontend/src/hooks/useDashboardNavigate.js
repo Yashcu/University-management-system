@@ -1,11 +1,21 @@
-import { useSearchParams } from 'react-router-dom';
+import { useCallback } from 'react'  // Import from React, not react-router-dom
+import { useSearchParams } from 'react-router-dom'  // Import router hooks separately
 
 export const useDashboardNavigate = () => {
-  const [, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const navigateToPage = (page) => {
-    setSearchParams({ page });
-  };
+  const navigateToPage = useCallback((page) => {
+    setSearchParams({ page })
+  }, [setSearchParams])
 
-  return navigateToPage;
-};
+  const getCurrentPage = useCallback(() => {
+    return searchParams.get('page')
+  }, [searchParams])
+
+  return {
+    navigateToPage,
+    getCurrentPage,
+  }
+}
+
+export default useDashboardNavigate

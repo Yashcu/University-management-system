@@ -1,79 +1,14 @@
-import React, { useEffect } from 'react';
-import Heading from '../../../components/ui/Heading';
-import DeleteConfirm from '../../../components/ui/DeleteConfirm';
-import { Button } from '../../../components/ui/Button';
-import Loading from '../../../components/ui/Loading';
-import Modal from '../../../components/ui/Modal';
-import AdminForm from './AdminForm';
-import AdminTable from './AdminTable';
-import { useCrud } from '../../../hooks/useCrud.jsx';
-import { adminService } from '../../../services/api';
+// features/admin/pages/ManageAdminPage.jsx - PLACEHOLDER
 
-const Admin = () => {
-  const {
-    data: admins,
-    isLoading,
-    isProcessing,
-    isModalOpen,
-    isDeleteConfirmOpen,
-    isEditing,
-    selectedItem,
-    fetchData,
-    openModal,
-    closeModal,
-    openDeleteConfirm,
-    closeDeleteConfirm,
-    handleUpsert,
-    handleDelete,
-  } = useCrud(adminService);
+import React from 'react'
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
+const ManageAdminPage = () => {
   return (
-    <div className="w-full mx-auto mt-10 flex justify-center items-start flex-col mb-10 relative">
-      <div className="flex justify-between items-center w-full mb-6">
-        <Heading title="Admin Management" />
-        <Button onClick={() => openModal()}>Add Admin</Button>
-      </div>
-
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <AdminTable
-          admins={admins}
-          onEdit={openModal}
-          onDelete={openDeleteConfirm}
-        />
-      )}
-
-      {isModalOpen && (
-        <Modal
-          title={isEditing ? 'Edit Admin' : 'Add New Admin'}
-          isOpen={isModalOpen}
-          onClose={closeModal}
-        >
-          <AdminForm
-            isEditing={isEditing}
-            selectedItem={selectedItem}
-            onUpsert={handleUpsert}
-            onCancel={closeModal}
-            isProcessing={isProcessing}
-          />
-        </Modal>
-      )}
-
-      {isDeleteConfirmOpen && (
-        <DeleteConfirm
-          isOpen={isDeleteConfirmOpen}
-          onClose={closeDeleteConfirm}
-          onConfirm={handleDelete}
-          message="Are you sure you want to delete this admin?"
-        />
-      )}
+    <div className="p-8">
+      <h2 className="text-2xl font-bold mb-4">Admin Management</h2>
+      <p className="text-gray-600">Admin management features coming soon...</p>
     </div>
-  );
-};
+  )
+}
 
-export default Admin;
+export default ManageAdminPage

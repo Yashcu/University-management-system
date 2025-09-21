@@ -106,7 +106,7 @@ const AddMarks = () => {
 
       {loading ? (
         <Loading />
-      ) : (students && students.length > 0) ? (
+      ) : students && students.length > 0 ? (
         <>
           <MarksTable
             students={students}

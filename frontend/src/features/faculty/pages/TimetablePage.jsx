@@ -65,9 +65,7 @@ const Timetable = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <Heading title="Manage Timetables" />
-        <Button onClick={() => openModal()}>
-          Upload Timetable
-        </Button>
+        <Button onClick={() => openModal()}>Upload Timetable</Button>
       </div>
 
       <div className="mb-6 max-w-xs">

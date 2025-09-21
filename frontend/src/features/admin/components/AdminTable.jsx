@@ -26,10 +26,7 @@ const AdminTable = ({ admins, onEdit, onDelete }) => {
                 <td className="py-4 px-6">{item.employeeId}</td>
                 <td className="py-4 px-6">{item.designation}</td>
                 <td className="py-4 px-6 text-center flex justify-center gap-4">
-                  <Button
-                    variant="secondary"
-                    onClick={() => onEdit(item)}
-                  >
+                  <Button variant="secondary" onClick={() => onEdit(item)}>
                     <MdEdit />
                   </Button>
                   <Button variant="danger" onClick={() => onDelete(item)}>

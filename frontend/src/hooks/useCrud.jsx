@@ -1,115 +1,132 @@
-import { useState, useCallback } from 'react';
-import toast from 'react-hot-toast';
+// src/hooks/useCrud.js - FIXED TO PREVENT LOOPS
 
-export const useCrud = (service, onFetchSuccess) => {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+import { useState, useCallback } from 'react'
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+export const useCrud = (service) => {
+  const [data, setData] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [error, setError] = useState(null)
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
 
-  const fetchData = useCallback(
-    async (params = {}) => {
-      setIsLoading(true);
-      try {
-        const res = await service.search(params);
-        const fetchedData = res.data?.data || [];
-        setData(fetchedData);
-        if (onFetchSuccess) onFetchSuccess(fetchedData);
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to fetch data.');
-        setData([]);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [service, onFetchSuccess]
-  );
-
-  const openModal = (item = null) => {
-    if (item) {
-      setIsEditing(true);
-      setSelectedItem(item);
-    } else {
-      setIsEditing(false);
-      setSelectedItem(null);
-    }
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedItem(null);
-    setIsEditing(false);
-  };
-
-  const openDeleteConfirm = (item) => {
-    setSelectedItem(item);
-    setIsDeleteConfirmOpen(true);
-  };
-
-  const closeDeleteConfirm = () => {
-    setIsDeleteConfirmOpen(false);
-    setSelectedItem(null);
-  };
-
-  const handleUpsert = async (formData) => {
-    setIsProcessing(true);
-    const action = isEditing ? 'Updating' : 'Adding';
-    toast.loading(`${action} item...`);
+  // Fetch data - FIXED: Removed service from dependency
+  const fetchData = useCallback(async (params = {}) => {
+    setIsLoading(true)
+    setError(null)
 
     try {
-      let res;
-      if (isEditing) {
-        res = await service.update(selectedItem._id, formData);
+      console.log('🔄 useCrud: Fetching data with params:', params)
+      const result = await service.getAll(params)
+
+      // Handle different response formats
+      let dataArray = []
+      if (Array.isArray(result)) {
+        dataArray = result
+      } else if (result.data && Array.isArray(result.data)) {
+        dataArray = result.data
+      } else if (result.students && Array.isArray(result.students)) {
+        dataArray = result.students
+      }
+
+      console.log('✅ useCrud: Data fetched successfully, count:', dataArray.length)
+      setData(dataArray)
+    } catch (error) {
+      console.error('❌ useCrud: Fetch error:', error)
+      setError(error.message)
+      setData([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, []) // ✅ EMPTY DEPS - service is accessed directly
+
+  // Modal handlers
+  const openModal = useCallback((item = null) => {
+    setSelectedItem(item)
+    setIsEditing(!!item)
+    setIsModalOpen(true)
+  }, [])
+
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false)
+    setSelectedItem(null)
+    setIsEditing(false)
+  }, [])
+
+  const openDeleteConfirm = useCallback((item) => {
+    setSelectedItem(item)
+    setIsDeleteConfirmOpen(true)
+  }, [])
+
+  const closeDeleteConfirm = useCallback(() => {
+    setIsDeleteConfirmOpen(false)
+    setSelectedItem(null)
+  }, [])
+
+  // CRUD operations
+  const handleUpsert = useCallback(async (itemData) => {
+    setIsProcessing(true)
+    setError(null)
+
+    try {
+      if (isEditing && selectedItem) {
+        await service.update(selectedItem._id || selectedItem.id, itemData)
       } else {
-        res = await service.add(formData);
+        await service.create(itemData)
       }
-      toast.dismiss();
-      toast.success(res.data.message);
-      closeModal();
-      fetchData(); // Refresh data
-    } catch (error) {
-      toast.dismiss();
-      toast.error(
-        error.response?.data?.message ||
-          `Failed to ${action.toLowerCase()} item.`
-      );
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
-  const handleDelete = async () => {
-    if (!selectedItem) return;
-    setIsProcessing(true);
-    toast.loading('Deleting item...');
-    try {
-      const res = await service.delete(selectedItem._id);
-      toast.dismiss();
-      toast.success(res.data.message);
-      closeDeleteConfirm();
-      fetchData(); // Refresh data
+      closeModal()
+      // Call fetchData without params to refresh
+      await fetchData()
+      return true
     } catch (error) {
-      toast.dismiss();
-      toast.error(error.response?.data?.message || 'Failed to delete item.');
+      console.error('Upsert error:', error)
+      setError(error.message)
+      return false
     } finally {
-      setIsProcessing(false);
+      setIsProcessing(false)
     }
-  };
+  }, [isEditing, selectedItem, closeModal, fetchData]) // ✅ ONLY NECESSARY DEPS
+
+  const handleDelete = useCallback(async () => {
+    if (!selectedItem) return false
+
+    setIsProcessing(true)
+    setError(null)
+
+    try {
+      await service.delete(selectedItem._id || selectedItem.id)
+      closeDeleteConfirm()
+      // Call fetchData without params to refresh
+      await fetchData()
+      return true
+    } catch (error) {
+      console.error('Delete error:', error)
+      setError(error.message)
+      return false
+    } finally {
+      setIsProcessing(false)
+    }
+  }, [selectedItem, closeDeleteConfirm, fetchData]) // ✅ ONLY NECESSARY DEPS
 
   return {
+    // Data
     data,
     isLoading,
     isProcessing,
+    error,
+
+    // Modal states
     isModalOpen,
     isDeleteConfirmOpen,
     isEditing,
     selectedItem,
+
+    // Functions
     fetchData,
     openModal,
     closeModal,
@@ -117,5 +134,5 @@ export const useCrud = (service, onFetchSuccess) => {
     closeDeleteConfirm,
     handleUpsert,
     handleDelete,
-  };
-};
+  }
+}

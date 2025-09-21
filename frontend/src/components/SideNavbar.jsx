@@ -7,7 +7,8 @@ import { navConfig } from '../config/navConfig';
 const NavLink = ({ to, userType, icon: Icon, children }) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const currentPage = searchParams.get('page') || navConfig[userType]?.[0]?.href || 'home';
+  const currentPage =
+    searchParams.get('page') || navConfig[userType]?.[0]?.href || 'home';
   const isActive = currentPage === to;
 
   return (
@@ -25,7 +26,7 @@ const NavLink = ({ to, userType, icon: Icon, children }) => {
 
 const SideNavbar = ({ userType, onLogout }) => {
   const navItems = navConfig[userType] || [];
-  const safeUserType = userType && userType.length > 0 ? userType : "User";
+  const safeUserType = userType && userType.length > 0 ? userType : 'User';
   const portalTitle = `${safeUserType.charAt(0).toUpperCase() + safeUserType.slice(1)} Portal`;
 
   return (

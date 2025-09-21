@@ -20,12 +20,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-const semesters = [1,2,3,4,5,6,7,8];
+const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 const materialTypes = [
   { value: 'notes', label: 'Notes' },
   { value: 'assignment', label: 'Assignment' },
   { value: 'syllabus', label: 'Syllabus' },
-  { value: 'other', label: 'Other' }
+  { value: 'other', label: 'Other' },
 ];
 
 const Material = () => {

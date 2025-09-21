@@ -1,168 +1,97 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import Heading from '../../../components/ui/Heading';
-import Loading from '../../../components/ui/Loading';
-import NoData from '../../../components/ui/NoData';
-import { Button } from '../../../components/ui/Button';
-import Modal from '../../../components/ui/Modal';
-import DeleteConfirm from '../../../components/ui/DeleteConfirm';
-import { studentService } from '../../../services/api';
-import { branchService } from '../../../services/api';
-import { useCrud } from '../../../hooks/useCrud';
-import StudentForm from './StudentForm';
-import StudentTable from './StudentTable';
-import toast from 'react-hot-toast';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import React, { useEffect, useState } from 'react'
+import { Button } from '../../../components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../../components/ui/dialog'
+import { Input } from '../../../components/ui/input'
+import { Heading } from '../../../components/ui/Heading'
+import StudentTable from '../components/StudentTable'
+import StudentForm from '../components/StudentForm'
+import { studentService } from '../../../services/studentService'
+import { useDebounce } from '../../../hooks/useDebounce'
+import toast from 'react-hot-toast'
+import { Plus, RefreshCw, Users } from 'lucide-react'
 
-const Student = () => {
-  const [branches, setBranches] = useState([]);
-  const [searchParams, setSearchParams] = useState({
-    studentId: '',
-    name: '',
-    branch: '',
-  });
+export default function StudentPage() {
+  const [students, setStudents] = useState([])
+  const [branches, setBranches] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState('')
+  const debounced = useDebounce(search, 500)
+  const [open, setOpen] = useState(false)
 
-  const {
-    data: students,
-    isLoading,
-    isProcessing,
-    isModalOpen,
-    isDeleteConfirmOpen,
-    isEditing,
-    selectedItem,
-    fetchData,
-    openModal,
-    closeModal,
-    openDeleteConfirm,
-    closeDeleteConfirm,
-    handleUpsert,
-    handleDelete,
-  } = useCrud(studentService);
-
-  const getBranches = useCallback(async () => {
+  // Fetch students
+  async function fetchStudents() {
+    setLoading(true)
     try {
-      const { data } = await branchService.search();
-      setBranches(data?.data || []);
-    } catch (error) {
-      toast.error('Failed to fetch branches');
+      const res = await studentService.getAll({ firstName: debounced })
+      setStudents(res.data || [])
+    } catch {
+      toast.error('Failed to load students')
+    } finally {
+      setLoading(false)
     }
-  }, []);
+  }
 
-  const executeSearch = useCallback(() => {
-    const activeSearchParams = Object.fromEntries(
-      Object.entries(searchParams).filter(([, value]) => value)
-    );
-    fetchData(activeSearchParams);
-  }, [fetchData, searchParams]);
+  // Fetch branches for form
+  async function fetchBranches() {
+    try {
+      const token = localStorage.getItem('userToken')
+      const res = await fetch('http://localhost:8000/api/branch', {
+        headers: { 'Content-Type':'application/json', Authorization:`Bearer ${token}` }
+      })
+      if (res.ok) {
+        const json = await res.json()
+        setBranches(json.data || json || [])
+      }
+    } catch {}
+  }
 
   useEffect(() => {
-    executeSearch();
-  }, [fetchData, searchParams]);
+    fetchStudents()
+  }, [debounced])
 
   useEffect(() => {
-    getBranches();
-  }, [getBranches]);
+    fetchBranches()
+  }, [])
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    executeSearch();
-  };
-
-  const handleBranchChange = (value) => {
-    setSearchParams({ ...searchParams, branch: value === 'all' ? '' : value });
-  };
+  async function handleCreate(data) {
+    try {
+      await studentService.create(data)
+      toast.success('Student created')
+      setOpen(false)
+      fetchStudents()
+    } catch (e) {
+      toast.error(e.message || 'Failed to create')
+    }
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <Heading title="Manage Students" />
-        <Button onClick={() => openModal()}>Add Student</Button>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <Heading title="Student Management" description={`${students.length} students`} icon={Users} />
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={fetchStudents} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+          </Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4" /> Add Student</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader><DialogTitle>Add New Student</DialogTitle></DialogHeader>
+              <div className="px-1">
+                <StudentForm onSubmit={handleCreate} onCancel={() => setOpen(false)} branches={branches} />
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
-
-      <form
-        onSubmit={handleSearch}
-        className="mb-6 p-4 bg-white rounded-md shadow-md grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
-      >
-        <Input
-          type="text"
-          placeholder="Search by ID..."
-          value={searchParams.studentId}
-          onChange={(e) =>
-            setSearchParams({ ...searchParams, studentId: e.target.value })
-          }
-        />
-        <Input
-          type="text"
-          placeholder="Search by name..."
-          value={searchParams.name}
-          onChange={(e) =>
-            setSearchParams({ ...searchParams, name: e.target.value })
-          }
-        />
-        <Select
-          onValueChange={handleBranchChange}
-          value={searchParams.branch || 'all'}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="All Branches" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Branches</SelectItem>
-            {branches.map((b) => (
-              <SelectItem key={b._id} value={b._id}>
-                {b.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Button type="submit">Search</Button>
-      </form>
-
-      {isLoading ? (
-        <Loading />
-      ) : students.length === 0 ? (
-        <NoData />
-      ) : (
-        <StudentTable
-          students={students}
-          onEdit={openModal}
-          onDelete={openDeleteConfirm}
-        />
-      )}
-
-      {isModalOpen && (
-        <Modal
-          title={isEditing ? 'Edit Student' : 'Add New Student'}
-          isOpen={isModalOpen}
-          onClose={closeModal}
-        >
-          <StudentForm
-            isEditing={isEditing}
-            selectedItem={selectedItem}
-            onUpsert={handleUpsert}
-            onCancel={closeModal}
-            isProcessing={isProcessing}
-            branches={branches}
-          />
-        </Modal>
-      )}
-
-      {isDeleteConfirmOpen && (
-        <DeleteConfirm
-          isOpen={isDeleteConfirmOpen}
-          onClose={closeDeleteConfirm}
-          onConfirm={handleDelete}
-        />
-      )}
+      <Input
+        placeholder="Search by first name..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className="max-w-sm"
+      />
+      <StudentTable students={students} loading={loading} onDelete={() => fetchStudents()} branches={branches} />
     </div>
-  );
-};
-
-export default Student;
+  )
+}

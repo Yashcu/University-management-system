@@ -1,41 +1,42 @@
+// config/navConfig.js
 import {
   Home,
   Users,
-  UserCheck,
-  Building,
   BookOpen,
-  FileText,
   Calendar,
+  FileText,
   ClipboardList,
-  User,
-  Bell,
   GraduationCap,
-  BookMarked,
-} from 'lucide-react';
+  UserCheck,
+  Search
+} from 'lucide-react'
 
 export const navConfig = {
-  admin: [
-    { href: 'home', icon: Home, label: 'Dashboard' },
-    { href: 'student', icon: Users, label: 'Students' },
-    { href: 'faculty', icon: UserCheck, label: 'Faculty' },
-    { href: 'admin', icon: User, label: 'Admins' },
-    { href: 'branch', icon: Building, label: 'Branches' },
-    { href: 'subject', icon: BookOpen, label: 'Subjects' },
-    { href: 'notice', icon: Bell, label: 'Notices' },
-    { href: 'exam', icon: FileText, label: 'Exams' },
+  student: [
+    { href: 'home', label: 'Dashboard', icon: Home },
+    { href: 'marks', label: 'View Marks', icon: ClipboardList },
+    { href: 'material', label: 'Material', icon: BookOpen },
+    { href: 'timetable', label: 'Timetable', icon: Calendar },
+    { href: 'notice', label: 'Notice', icon: FileText },
+    { href: 'exam', label: 'Exam', icon: GraduationCap },
   ],
   faculty: [
-    { href: 'home', icon: Home, label: 'Dashboard' },
-    { href: 'add-marks', icon: ClipboardList, label: 'Add Marks' },
-    { href: 'timetable', icon: Calendar, label: 'Timetable' },
-    { href: 'material', icon: BookMarked, label: 'Materials' },
-    { href: 'notice', icon: Bell, label: 'Notices' },
+    { href: 'home', label: 'Dashboard', icon: Home },
+    { href: 'student-finder', label: 'Student Finder', icon: Search },
+    { href: 'material', label: 'Material', icon: BookOpen },
+    { href: 'timetable', label: 'Timetable', icon: Calendar },
+    { href: 'add-marks', label: 'Add Marks', icon: ClipboardList },
+    { href: 'notice', label: 'Notice', icon: FileText },
+    { href: 'exam', label: 'Exam', icon: GraduationCap },
   ],
-  student: [
-    { href: 'home', icon: Home, label: 'Dashboard' },
-    { href: 'view-marks', icon: GraduationCap, label: 'View Marks' },
-    { href: 'timetable', icon: Calendar, label: 'Timetable' },
-    { href: 'material', icon: BookMarked, label: 'Materials' },
-    { href: 'notice', icon: Bell, label: 'Notices' },
+  admin: [
+    { href: 'home', label: 'Dashboard', icon: Home },
+    { href: 'student', label: 'Students', icon: Users },
+    { href: 'faculty', label: 'Faculty', icon: UserCheck },
+    { href: 'admin', label: 'Admins', icon: Users },
+    { href: 'branch', label: 'Branches', icon: BookOpen },
+    { href: 'subject', label: 'Subjects', icon: BookOpen },
+    { href: 'notice', label: 'Notice', icon: FileText },
+    { href: 'exam', label: 'Exams', icon: GraduationCap },
   ],
-};
+}

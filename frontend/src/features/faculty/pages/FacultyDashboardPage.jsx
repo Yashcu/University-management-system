@@ -9,8 +9,12 @@ const FacultyDashboard = () => {
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       <Card>
         <CardContent className="p-6 flex flex-col items-start">
-          <div className="mb-2 text-2xl font-semibold">Welcome, {userProfile?.name || 'Faculty'}!</div>
-          <div className="text-muted-foreground">Here’s a quick overview of your actions and information for the day.</div>
+          <div className="mb-2 text-2xl font-semibold">
+            Welcome, {userProfile?.name || 'Faculty'}!
+          </div>
+          <div className="text-muted-foreground">
+            Here’s a quick overview of your actions and information for the day.
+          </div>
         </CardContent>
       </Card>
       <Card>

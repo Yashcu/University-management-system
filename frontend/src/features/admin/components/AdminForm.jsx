@@ -322,11 +322,7 @@ const AdminForm = ({
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            loading={isProcessing}
-            disabled={isProcessing}
-          >
+          <Button type="submit" loading={isProcessing} disabled={isProcessing}>
             {isEditing ? 'Update Admin' : 'Add Admin'}
           </Button>
         </div>

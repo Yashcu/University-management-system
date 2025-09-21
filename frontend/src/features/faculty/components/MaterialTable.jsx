@@ -52,7 +52,8 @@ const MaterialTable = ({ materials, onDelete, subjects = [] }) => {
               <TableCell>{material.semester || 'N/A'}</TableCell>
               <TableCell>
                 {material.type
-                  ? material.type.charAt(0).toUpperCase() + material.type.slice(1)
+                  ? material.type.charAt(0).toUpperCase() +
+                    material.type.slice(1)
                   : 'N/A'}
               </TableCell>
               <TableCell className="text-center">

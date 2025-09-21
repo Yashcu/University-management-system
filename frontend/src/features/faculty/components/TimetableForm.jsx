@@ -121,11 +121,7 @@ const TimetableForm = ({ onUpsert, onCancel, isProcessing, branches }) => {
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            loading={isProcessing}
-            disabled={isProcessing}
-          >
+          <Button type="submit" loading={isProcessing} disabled={isProcessing}>
             Upload Timetable
           </Button>
         </div>

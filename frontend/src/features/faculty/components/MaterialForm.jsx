@@ -23,16 +23,30 @@ import {
 const materialSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   subject: z.string().min(1, 'Subject is required'),
-  semester: z.coerce.number().int().min(1, 'Semester is required').max(8, 'Invalid semester'),
+  semester: z.coerce
+    .number()
+    .int()
+    .min(1, 'Semester is required')
+    .max(8, 'Invalid semester'),
   branch: z.string().min(1, 'Branch is required'),
-  type: z.enum(['notes', 'assignment', 'syllabus', 'other'], { errorMap: () => ({ message: "Type is required" }) }),
+  type: z.enum(['notes', 'assignment', 'syllabus', 'other'], {
+    errorMap: () => ({ message: 'Type is required' }),
+  }),
   file: z.any().refine((files) => files?.length === 1, 'File is required.'),
 });
 
-const SEMESTER_OPTIONS = Array.from({ length: 8 }, (_, i) => (i + 1).toString());
+const SEMESTER_OPTIONS = Array.from({ length: 8 }, (_, i) =>
+  (i + 1).toString()
+);
 const TYPE_OPTIONS = ['notes', 'assignment', 'syllabus', 'other'];
 
-const MaterialForm = ({ onUpsert, onCancel, isProcessing, subjects = [], branches = [] }) => {
+const MaterialForm = ({
+  onUpsert,
+  onCancel,
+  isProcessing,
+  subjects = [],
+  branches = [],
+}) => {
   const form = useForm({
     resolver: zodResolver(materialSchema),
     defaultValues: {
@@ -48,7 +62,7 @@ const MaterialForm = ({ onUpsert, onCancel, isProcessing, subjects = [], branche
   const onSubmit = (data) => {
     const formData = new FormData();
     formData.append('title', data.title);
-    formData.append('subject', data.subject);   // Backend expects "subject"
+    formData.append('subject', data.subject); // Backend expects "subject"
     formData.append('semester', data.semester);
     formData.append('branch', data.branch);
     formData.append('type', data.type);
@@ -180,7 +194,11 @@ const MaterialForm = ({ onUpsert, onCancel, isProcessing, subjects = [], branche
             <FormItem>
               <FormLabel>Material File (PDF, DOCX, etc.)</FormLabel>
               <FormControl>
-                <Input type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onChange={(e) => field.onChange(e.target.files)} />
+                <Input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                  onChange={(e) => field.onChange(e.target.files)}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -191,11 +209,7 @@ const MaterialForm = ({ onUpsert, onCancel, isProcessing, subjects = [], branche
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            loading={isProcessing}
-            disabled={isProcessing}
-          >
+          <Button type="submit" loading={isProcessing} disabled={isProcessing}>
             Upload Material
           </Button>
         </div>
