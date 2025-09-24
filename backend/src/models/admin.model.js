@@ -93,8 +93,12 @@ const adminDetailsSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+adminDetailsSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
 
 adminDetailsSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
@@ -103,6 +107,13 @@ adminDetailsSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-const adminDetails = mongoose.model('AdminDetail', adminDetailsSchema);
+adminDetailsSchema.set('toJSON', {
+  transform: function (doc, ret) {
+    delete ret.password;
+    delete ret.__v;
+    return ret;
+  },
+});
 
+const adminDetails = mongoose.model('AdminDetail', adminDetailsSchema);
 module.exports = adminDetails;

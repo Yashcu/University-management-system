@@ -3,7 +3,7 @@ const router = express.Router();
 const auth = require('../middlewares/auth.middleware');
 const authorize = require('../middlewares/authorize.middleware');
 const { USER_ROLES } = require('../utils/constants');
-const upload = require('../middlewares/multer.middleware');
+const { upload, handleMulterError } = require('../middlewares/multer.middleware');
 const validate = require('../middlewares/validation.middleware');
 const {
   addExamSchema,
@@ -24,6 +24,7 @@ router.post(
   auth,
   authorize([USER_ROLES.ADMIN]),
   upload.single('file'),
+  handleMulterError,
   validate(addExamSchema),
   addExamController
 );
@@ -32,6 +33,7 @@ router.patch(
   auth,
   authorize([USER_ROLES.ADMIN]),
   upload.single('file'),
+  handleMulterError,
   validate(updateExamSchema),
   updateExamController
 );

@@ -2,21 +2,27 @@ const jwt = require('jsonwebtoken');
 const ApiResponse = require('../utils/ApiResponse');
 const config = require('../config');
 const logger = require('../utils/logger');
+const { USER_ROLES } = require('../utils/constants');
 
-const auth = async (req, res, next) => {
+const auth = (requiredRole = null) => async (req, res, next) => {
   try {
-    let token = req.header('Authorization');
+    const token =
+      req.cookies?.accessToken ||
+      req.header('Authorization')?.replace('Bearer ', '');
 
-    if (!token || !token.startsWith('Bearer ')) {
-      return ApiResponse.unauthorized('Authentication token required').send(res);
+    if (!token) {
+      return ApiResponse.unauthorized('No token provided').send(res);
     }
-
-    token = token.split(' ')[1];
 
     try {
       const decoded = jwt.verify(token, config.jwtSecret);
       req.user = decoded;
       req.userId = decoded.userId;
+
+      if (requiredRole && req.user.role !== requiredRole) {
+        return ApiResponse.forbidden('You do not have permission to perform this action.').send(res);
+      }
+
       next();
     } catch (jwtError) {
       logger.error('JWT Error:', jwtError);

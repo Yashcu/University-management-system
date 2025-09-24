@@ -1,30 +1,26 @@
-// src/routes/index.js
-
 const express = require('express');
 const router = express.Router();
 
-// Import routes
-const adminRoutes = require('./admin.route');
-const facultyRoutes = require('./faculty.route');
-const studentRoutes = require('./student.route');
-const branchRoutes = require('./branch.route');
-const subjectRoutes = require('./subject.route');
-const noticeRoutes = require('./notice.route');
-const timetableRoutes = require('./timetable.route');
-const materialRoutes = require('./material.route');
-const examRoutes = require('./exam.route');
-const marksRoutes = require('./marks.route');
+const adminRoutes = require('./admin.routes');
+const facultyRoutes = require('./faculty.routes');
+const studentRoutes = require('./student.routes');
+const branchRoutes = require('./branch.routes');
+const subjectRoutes = require('./subject.routes');
+const noticeRoutes = require('./notice.routes');
+const timetableRoutes = require('./timetable.routes');
+const materialRoutes = require('./material.routes');
+const examRoutes = require('./exam.routes');
+const marksRoutes = require('./marks.routes');
 
-// Use routes
-router.use('/admin', adminRoutes);
-router.use('/faculty', facultyRoutes);
-router.use('/student', studentRoutes);
-router.use('/branch', branchRoutes);
-router.use('/subject', subjectRoutes);
-router.use('/notice', noticeRoutes);
-router.use('/timetable', timetableRoutes);
-router.use('/material', materialRoutes);
-router.use('/exam', examRoutes);
-router.use('/marks', marksRoutes);
+router.use('/v1/admins', adminRoutes);
+router.use('/v1/faculty', facultyRoutes);
+router.use('/v1/students', studentRoutes);
+router.use('/v1/branches', branchRoutes);
+router.use('/v1/subjects', subjectRoutes);
+router.use('/v1/notices', noticeRoutes);
+router.use('/v1/timetables', timetableRoutes);
+router.use('/v1/materials', materialRoutes);
+router.use('/v1/exams', examRoutes);
+router.use('/v1/marks', marksRoutes);
 
 module.exports = router;

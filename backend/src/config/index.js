@@ -6,6 +6,7 @@ const config = {
   jwtSecret: process.env.JWT_SECRET,
   frontendApiLink: process.env.FRONTEND_API_LINK,
   backendUrl: process.env.BACKEND_URL || 'http://localhost:4000',
+  appDomain: process.env.APP_DOMAIN || 'college.com',
 
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,

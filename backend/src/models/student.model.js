@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+
 const studentDetailsSchema = new mongoose.Schema(
   {
     enrollmentNo: {
@@ -91,9 +92,14 @@ const studentDetailsSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+studentDetailsSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
+
+// Password hashing middleware
 studentDetailsSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();
@@ -101,18 +107,13 @@ studentDetailsSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-const studentDetails = mongoose.model('StudentDetail', studentDetailsSchema);
-
-studentDetailsSchema.virtual('profileUrl').get(function() {
-  if (this.profile) {
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:4000';
-    return `${backendUrl}/media/${this.profile}`;
+studentDetailsSchema.set('toJSON', {
+  transform: function(doc, ret) {
+    delete ret.password;
+    delete ret.__v;
+    return ret;
   }
-  return null;
 });
 
-// Ensure virtuals are included when converting to JSON
-studentDetailsSchema.set('toJSON', { virtuals: true });
-studentDetailsSchema.set('toObject', { virtuals: true });
-
+const studentDetails = mongoose.model('StudentDetail', studentDetailsSchema);
 module.exports = studentDetails;

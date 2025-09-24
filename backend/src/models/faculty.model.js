@@ -95,8 +95,12 @@ const facultyDetailsSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+facultyDetailsSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
 
 facultyDetailsSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
@@ -105,6 +109,13 @@ facultyDetailsSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-const facultyDetails = mongoose.model('FacultyDetail', facultyDetailsSchema);
+facultyDetailsSchema.set('toJSON', {
+  transform: function(doc,ret){
+    delete ret.password;
+    delete ret.__v;
+    return ret;
+  }
+})
 
+const facultyDetails = mongoose.model('FacultyDetail', facultyDetailsSchema);
 module.exports = facultyDetails;

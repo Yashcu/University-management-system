@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-const upload = require('../middlewares/multer.middleware');
+const { upload, handleMulterError } = require('../middlewares/multer.middleware');
 const auth = require('../middlewares/auth.middleware');
 const authorize = require('../middlewares/authorize.middleware');
 const { USER_ROLES } = require('../utils/constants');
@@ -24,6 +24,7 @@ router.post(
   '/',
   auth,
   upload.single('file'),
+  handleMulterError,
   authorize([USER_ROLES.ADMIN]),
   validate(addTimetableSchema),
   addTimetableController
@@ -34,6 +35,7 @@ router.put(
   auth,
   authorize([USER_ROLES.ADMIN]),
   upload.single('file'),
+  handleMulterError,
   validate(updateTimetableSchema),
   updateTimetableController
 );

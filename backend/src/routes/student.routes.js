@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../middlewares/multer.middleware');
+const { upload, handleMulterError } = require('../middlewares/multer.middleware');
 const auth = require('../middlewares/auth.middleware');
 const validate = require('../middlewares/validation.middleware');
 const {
@@ -29,6 +29,7 @@ const {
 router.post(
   '/register',
   upload.single('file'),
+  handleMulterError,
   validate(registerStudentSchema),
   registerStudentController
 );
@@ -42,6 +43,7 @@ router.patch(
   '/:id',
   auth,
   upload.single('file'),
+  handleMulterError,
   validate(updateDetailsSchema),
   updateDetailsController
 );

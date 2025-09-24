@@ -1,7 +1,7 @@
 const adminDetails = require('../models/admin.model');
-const resetToken = require('../models/reset-password.model');
+const resetPassword = require('../models/reset-password.model');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const jwt =('jsonwebtoken');
 const sendResetMail = require('../utils/SendMail');
 const config = require('../config');
 const { USER_ROLES, JWT_EXPIRATION } = require('../utils/constants');
@@ -13,13 +13,13 @@ const loginAdmin = async (loginData) => {
   const user = await adminDetails.findOne({ email });
 
   if (!user) {
-    throw new ApiError(404, 'User not found');
+    throw new ApiError(404, 'Admin not found with this email');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    throw new ApiError(401, 'Invalid password');
+    throw new ApiError(401, 'Invalid credentials');
   }
 
   const payload = { userId: user._id, role: USER_ROLES.ADMIN };
@@ -31,9 +31,8 @@ const loginAdmin = async (loginData) => {
 
 const getAllDetails = async () => {
   const users = await adminDetails.find().select('-__v -password');
-
-  if (!users || users.length === 0) {
-    throw new ApiError(404, 'No Admin Found');
+  if (!users.length) {
+    throw new ApiError(404, 'No Admins Found');
   }
   return users;
 };
@@ -49,21 +48,22 @@ const registerAdmin = async (adminData, file) => {
 
   const employeeId = Math.floor(100000 + Math.random() * 900000);
 
+  const profileUrl = file ? file.path : null;
+
   const user = await adminDetails.create({
     ...adminData,
     employeeId,
-    profile: file.filename,
+    profile: profileUrl,
     password: 'admin123',
   });
 
-  return await adminDetails.findById(user._id).select('-__v -password');
+  return adminDetails.findById(user._id).select('-__v -password');
 };
 
 const getMyDetails = async (userId) => {
   const user = await adminDetails.findById(userId).select('-password -__v');
-
   if (!user) {
-    throw new ApiError(404, 'User not found');
+    throw new ApiError(404, 'Admin not found');
   }
   return user;
 };
@@ -74,7 +74,7 @@ const updateDetails = async (adminId, adminData, file) => {
   if (phone) {
     await checkIfExists(
       adminDetails,
-      { _id: { $ne: adminId }, phone: phone },
+      { _id: { $ne: adminId }, phone },
       'Phone number already in use'
     );
   }
@@ -82,36 +82,28 @@ const updateDetails = async (adminId, adminData, file) => {
   if (email) {
     await checkIfExists(
       adminDetails,
-      { _id: { $ne: adminId }, email: email },
+      { _id: { $ne: adminId }, email },
       'Email already in use'
     );
   }
 
   if (password) {
-    const salt = await bcrypt.genSalt(10);
-    adminData.password = await bcrypt.hash(password, salt);
+    adminData.password = await bcrypt.hash(password, 10);
   }
 
   if (file) {
-    adminData.profile = file.filename;
+    adminData.profile = file.path;
   }
 
-  if (adminData['emergencyContact[name]']) {
+  if (adminData['emergencyContact.name']) {
     adminData.emergencyContact = {
-      name: adminData['emergencyContact[name]'],
-      relationship: adminData['emergencyContact[relationship]'],
-      phone: adminData['emergencyContact[phone]'],
+      name: adminData['emergencyContact.name'],
+      relationship: adminData['emergencyContact.relationship'],
+      phone: adminData['emergencyContact.phone'],
     };
-    delete adminData['emergencyContact[name]'];
-    delete adminData['emergencyContact[relationship]'];
-    delete adminData['emergencyContact[phone]'];
-  }
-
-  if (adminData.dob) {
-    adminData.dob = new Date(adminData.dob);
-  }
-  if (adminData.joiningDate) {
-    adminData.joiningDate = new Date(adminData.joiningDate);
+    delete adminData['emergencyContact.name'];
+    delete adminData['emergencyContact.relationship'];
+    delete adminData['emergencyContact.phone'];
   }
 
   const updatedUser = await adminDetails
@@ -121,113 +113,62 @@ const updateDetails = async (adminId, adminData, file) => {
   if (!updatedUser) {
     throw new ApiError(404, 'Admin not found');
   }
+
   return updatedUser;
 };
 
 const deleteDetails = async (adminId) => {
-  if (!adminId) {
-    throw new ApiError(400, 'Admin ID is required');
-  }
-
-  const user = await adminDetails.findById(adminId);
-
+  const user = await adminDetails.findByIdAndDelete(adminId);
   if (!user) {
-    throw new ApiError(404, 'No Admin Found');
+    throw new ApiError(404, 'Admin not found');
   }
-
-  await adminDetails.findByIdAndDelete(adminId);
+  return { message: 'Admin deleted successfully' };
 };
 
 const sendForgetPasswordEmail = async (email) => {
-  if (!email) {
-    throw new ApiError(400, 'Email is required');
-  }
-
   const user = await adminDetails.findOne({ email });
-
   if (!user) {
-    throw new ApiError(404, 'No Admin Found');
+    throw new ApiError(404, 'Admin not found with this email');
   }
-  const resetTkn = jwt.sign(
-    {
-      _id: user._id,
-    },
-    config.jwtSecret,
-    {
-      expiresIn: '10m',
-    }
-  );
 
-  await resetToken.deleteMany({
-    type: 'AdminDetails',
-    userId: user._id,
-  });
+  const token = jwt.sign({ _id: user._id }, config.jwtSecret, { expiresIn: '10m' });
 
-  const resetId = await resetToken.create({
-    resetToken: resetTkn,
-    type: 'AdminDetails',
-    userId: user._id,
-  });
+  await resetPassword.deleteMany({ userId: user._id, type: 'AdminDetail' });
+    const reset = await resetPassword.create({
+        resetToken: token,
+        type: 'AdminDetail',
+        userId: user._id,
+    });
 
-  await sendResetMail(user.email, resetId._id, 'admin');
+  await sendResetMail(user.email, reset._id, 'admin');
 };
 
 const updatePassword = async (resetId, password) => {
-  if (!resetId || !password) {
-    throw new ApiError(400, 'Password and ResetId is Required');
-  }
+    const reset = await resetPassword.findById(resetId);
+    if (!reset) {
+        throw new ApiError(404, 'Invalid or expired reset link');
+    }
 
-  const resetTkn = await resetToken.findById(resetId);
+    const decoded = jwt.verify(reset.resetToken, config.jwtSecret);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  if (!resetTkn) {
-    throw new ApiError(404, 'No Reset Request Found');
-  }
-
-  const verifyToken = await jwt.verify(resetTkn.resetToken, config.jwtSecret);
-
-  if (!verifyToken) {
-    throw new ApiError(401, 'Token Expired');
-  }
-
-  const salt = await bcrypt.genSalt(10);
-
-  const hashedPassword = await bcrypt.hash(password, salt);
-
-  await adminDetails.findByIdAndUpdate(verifyToken._id, {
-    password: hashedPassword,
-  });
-
-  await resetToken.deleteMany({
-    type: 'AdminDetails',
-    userId: verifyToken._id,
-  });
+    await adminDetails.findByIdAndUpdate(decoded._id, { password: hashedPassword });
+    await resetPassword.deleteMany({ userId: decoded._id });
 };
 
 const updateLoggedInPassword = async (userId, currentPassword, newPassword) => {
-  if (!currentPassword || !newPassword) {
-    throw new ApiError(400, 'Current password and new password are required');
-  }
+    const user = await adminDetails.findById(userId);
+    if (!user) {
+        throw new ApiError(404, 'Admin not found');
+    }
 
-  if (newPassword.length < 8) {
-    throw new ApiError(400, 'New password must be at least 8 characters long');
-  }
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+        throw new ApiError(401, 'Incorrect current password');
+    }
 
-  const user = await adminDetails.findById(userId);
-  if (!user) {
-    throw new ApiError(404, 'User not found');
-  }
-
-  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
-  if (!isPasswordValid) {
-    throw new ApiError(401, 'Current password is incorrect');
-  }
-
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-  await adminDetails.findByIdAndUpdate(userId, {
-    password: hashedPassword,
-  });
+    user.password = newPassword;
+    await user.save();
 };
 
 module.exports = {
